@@ -6,16 +6,21 @@ on:
   pull_request:
     branches: ["**"]
 
+defaults:
+  run:
+    working-directory: ./admin-panel
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    working-directory: ./admin-panel
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          channel: "stable" 
-          flutter-version-file: pubspec.yaml
+          channel: any
+          flutter-version-file: admin-panel/pubspec.yaml
+
       - run: flutter --version
     
       - name: Install dependencies
