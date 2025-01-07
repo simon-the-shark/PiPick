@@ -85,10 +85,9 @@ Future<void> main() async {
 
   final admins = await isar.admins.where().findAll();
   print("Admini:");
-  for (var admin in admins) {
+  for (final admin in admins) {
     print("ID: ${admin.id}, Login: ${admin.login}, Email: ${admin.email}");
-    final adminUsers = admin.users;
-    for (final user in adminUsers) {
+    for (final user in admin.users) {
       print(
           "  Użytkownik: ${user.name} ${user.surname}, Telefon: ${user.phone}");
     }
@@ -96,7 +95,7 @@ Future<void> main() async {
 
   final users = await isar.users.where().findAll();
   print("\nUżytkownicy:");
-  for (var user in users) {
+  for (final user in users) {
     print(
         "ID: ${user.id}, Name: ${user.name} ${user.surname}, Phone: ${user.phone}");
     final userStrefy = await user.zones;
