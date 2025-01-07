@@ -4,6 +4,7 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "dashboard_page.dart";
+import "logs_list_page.dart";
 import "providers.dart";
 
 Future<void> main() async {
@@ -29,7 +30,7 @@ class MyApp extends ConsumerWidget {
         primarySwatch: Colors.blue,
       ),
       home: accessZoneAsyncValue.when(
-        data: (zone) => const DashboardPage(),
+        data: (zone) => const LogsListPage(),
         loading: () => Scaffold(
           appBar: AppBar(
             title: const Text("Dashboard"),
