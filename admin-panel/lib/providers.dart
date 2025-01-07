@@ -20,7 +20,6 @@ final isarFutureProvider = FutureProvider<Isar>((ref) async {
 });
 
 final accessZoneProvider = FutureProvider<AccessZone>((ref) async {
-
   final isar = await ref.watch(isarFutureProvider.future);
 
   AccessZone? zone = await isar.accessZones.get(2);
@@ -36,4 +35,16 @@ final accessZoneProvider = FutureProvider<AccessZone>((ref) async {
   }
 
   return zone;
+});
+
+final accessZonesProvider = FutureProvider<List<AccessZone>>((ref) async {
+  final isar = await ref.watch(isarFutureProvider.future);
+  return isar.accessZones.where().findAll();
+});
+
+// FutureProvider to fetch all Logs
+final allLogsProvider = FutureProvider<List<Logs>>((ref) async {
+  final isar = await ref.watch(isarFutureProvider.future);
+  // POTEZNY QUERRY final test = await isar.logs.filter().zone((q) => q.numberEqualTo(10)).user((q) => q.nameEqualTo("Anna")).timestampBetween(lower, upper).sortByTimestamp().findAll();
+  return isar.logs.where().findAll();
 });
