@@ -18,15 +18,33 @@ class LogsListPage extends StatefulWidget {
 
 class _LogsListPageState extends State<LogsListPage> {
   late Future<List<Logs>> _futureLogs;
+  late Future<List<AccessZone>> _futureZones;
+
+  AccessZone? _selectedZone;
+  bool _isAscending = true;
 
   @override
   void initState() {
     super.initState();
     _futureLogs = _loadLogs();
+    _futureZones = _loadZones();
   }
 
   Future<List<Logs>> _loadLogs() async {
-    return widget.isar.logs.where().findAll();
+    // Tworzymy bazowe zapytanie `where()`
+    var baseQuery = widget.isar.logs.where();
+
+    // Dodajemy sortowanie do zapytania
+    var sortedQuery = _isAscending
+        ? baseQuery.sortByTimestamp()
+        : baseQuery.sortByTimestampDesc();
+
+    // Pobieramy dane z finalnego zapytania
+    return sortedQuery.findAll();
+  }
+
+  Future<List<AccessZone>> _loadZones() async {
+    return widget.isar.accessZones.where().findAll();
   }
 
   Future<void> _exportToCSV(List<Logs> logs) async {
@@ -41,10 +59,10 @@ class _LogsListPageState extends State<LogsListPage> {
       final data = logs.map((log) {
         return [
           log.id,
-          log.timestamp,
+          log.timestamp.toIso8601String(),
           log.user.value?.name ?? "brak",
           log.zone.value?.number ?? "brak",
-          if (log.successful) "Yes" else "No",
+          log.successful ? "Yes" : "No",
         ];
       }).toList();
 
@@ -80,6 +98,19 @@ class _LogsListPageState extends State<LogsListPage> {
       appBar: AppBar(
         title: const Text("Historia wejść/wyjść"),
         actions: [
+          // Sorting Button
+          IconButton(
+            icon:
+                Icon(_isAscending ? Icons.arrow_upward : Icons.arrow_downward),
+            tooltip: "Sort by Date",
+            onPressed: () {
+              setState(() {
+                _isAscending = !_isAscending;
+                _futureLogs = _loadLogs();
+              });
+            },
+          ),
+          // Export Button
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () async {
@@ -94,6 +125,53 @@ class _LogsListPageState extends State<LogsListPage> {
             },
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FutureBuilder<List<AccessZone>>(
+              future: _futureZones,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("No Zones Available"));
+                }
+
+                final zones = snapshot.data!;
+                return Row(
+                  children: [
+                    const Text("Filter by Zone: "),
+                    DropdownButton<AccessZone>(
+                      value: _selectedZone,
+                      hint: const Text("All Zones"),
+                      items: [
+                        const DropdownMenuItem<AccessZone>(
+                          value: null,
+                          child: Text("All Zones"),
+                        ),
+                        ...zones.map((zone) {
+                          return DropdownMenuItem<AccessZone>(
+                            value: zone,
+                            child: Text("Zone ${zone.number}"),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (zone) {
+                        setState(() {
+                          _selectedZone = zone;
+                          _futureLogs = _loadLogs();
+                        });
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
       body: FutureBuilder<List<Logs>>(
         future: _futureLogs,
@@ -116,7 +194,7 @@ class _LogsListPageState extends State<LogsListPage> {
                 subtitle: Text(
                   'Użytkownik: ${log.user.value?.name ?? "brak"}\n'
                   'Strefa: ${log.zone.value?.number ?? "brak"}\n'
-                  "Udane wejście: ${log.successful}",
+                  "Udane wejście: ${log.successful ? "Yes" : "No"}",
                 ),
               );
             },

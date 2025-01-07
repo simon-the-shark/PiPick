@@ -1,138 +1,147 @@
+// lib/dashboard_page.dart
+
+import "dart:async";
+
 import "package:fl_chart/fl_chart.dart";
 import "package:flutter/material.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:intl/intl.dart";
 import "package:isar/isar.dart";
 
 import "./database/models.dart";
+import "./providers.dart";
 
-class DashboardPage extends StatefulWidget {
-  final Isar isar;
-  final AccessZone zone;
-
+class DashboardPage extends HookConsumerWidget {
   const DashboardPage({
     super.key,
-    required this.isar,
-    required this.zone,
   });
 
   @override
-  // ignore: library_private_types_in_public_api
-  _DashboardPageState createState() => _DashboardPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isarAsyncValue = ref.watch(isarFutureProvider);
 
-class _DashboardPageState extends State<DashboardPage> {
-  List<Logs> allLogs = [];
-  List<Logs> failedLogs = [];
-  Map<String, int> entriesFrequency = {};
-  Map<String, int> failedEntriesFrequency = {};
+    final accessZoneAsyncValue = ref.watch(accessZoneProvider);
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-  }
+    final allLogs = useState<List<Logs>>([]);
+    final failedLogs = useState<List<Logs>>([]);
+    final entriesFrequency = useState<Map<String, int>>({});
+    final failedEntriesFrequency = useState<Map<String, int>>({});
+    final isLoading = useState<bool>(true);
+    final error = useState<String?>(null);
 
-  Future<void> fetchData() async {
-    final logs = await widget.isar.logs
-        .filter()
-        .zone(
-          (q) => q.idEqualTo(widget.zone.id),
-        )
-        .findAll();
+    useEffect(() {
+      if (isarAsyncValue is AsyncData<Isar> &&
+          accessZoneAsyncValue is AsyncData<AccessZone>) {
+        Future<void> fetchData() async {
+          try {
+            final isar = isarAsyncValue.value;
+            final zone = accessZoneAsyncValue.value;
+            final logs = await isar.logs
+                .filter()
+                .zone((q) => q.idEqualTo(zone.id))
+                .findAll();
 
-    setState(() {
-      allLogs = logs;
-      failedLogs = logs.where((log) => !log.successful).toList();
-      processEntriesFrequency();
-      processFailedEntriesFrequency();
-    });
-  }
+            final successfulLogs = logs;
+            final failed = logs.where((log) => !log.successful).toList();
 
-  void processEntriesFrequency() {
-    final Map<String, int> frequency = {};
-    for (var log in allLogs) {
-      final String day = DateFormat("yyyy-MM-dd").format(log.timestamp);
-      frequency[day] = (frequency[day] ?? 0) + 1;
-    }
+            final freq = <String, int>{};
+            for (final log in successfulLogs) {
+              final day = DateFormat("yyyy-MM-dd").format(log.timestamp);
+              freq[day] = (freq[day] ?? 0) + 1;
+            }
+            final sortedKeys = freq.keys.toList()..sort();
+            final sortedFreq = {for (final k in sortedKeys) k: freq[k]!};
 
-    final sortedKeys = frequency.keys.toList()..sort();
-    entriesFrequency = {for (final k in sortedKeys) k: frequency[k]!};
-  }
+            final failedFreq = <String, int>{};
+            for (final log in failed) {
+              final day = DateFormat("yyyy-MM-dd").format(log.timestamp);
+              failedFreq[day] = (failedFreq[day] ?? 0) + 1;
+            }
+            final sortedFailedKeys = failedFreq.keys.toList()..sort();
+            final sortedFailedFreq = {
+              for (final k in sortedFailedKeys) k: failedFreq[k]!,
+            };
 
-  void processFailedEntriesFrequency() {
-    final Map<String, int> frequency = {};
-    for (final log in failedLogs) {
-      final String day = DateFormat("yyyy-MM-dd").format(log.timestamp);
-      frequency[day] = (frequency[day] ?? 0) + 1;
-    }
-    final sortedKeys = frequency.keys.toList()..sort();
-    failedEntriesFrequency = {for (final k in sortedKeys) k: frequency[k]!};
-  }
+            allLogs.value = successfulLogs;
+            failedLogs.value = failed;
+            entriesFrequency.value = sortedFreq;
+            failedEntriesFrequency.value = sortedFailedFreq;
+          } catch (e) {
+            error.value = "Failed to fetch logs: $e";
+          } finally {
+            isLoading.value = false;
+          }
+        }
 
-  @override
-  Widget build(BuildContext context) {
+        unawaited(fetchData());
+      }
+
+      return null;
+    }, [isarAsyncValue, accessZoneAsyncValue]);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Dashboard - ${widget.zone.location}",
-        ),
+        title: const Text("Dashboard"),
       ),
-      body: (allLogs.isEmpty && failedLogs.isEmpty)
+      body: isLoading.value
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Column(
-                  children: [
-                    // Wykres częstotliwości wejść
-                    Text(
-                      "Częstotliwość Wejść - ${widget.zone.location}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 300,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: LineChart(
-                          buildLineChartData(
-                            entriesFrequency,
-                            Colors.blueAccent,
-                            "Wejść",
+          : allLogs.value.isEmpty && failedLogs.value.isEmpty
+              ? const Center(child: Text("No Logs Available"))
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Column(
+                      children: [
+                        // Frequency of Entries Chart
+                        Text(
+                          "Częstotliwość Wejść - ${accessZoneAsyncValue.asData?.value.location ?? ''}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    // Wykres nieudanych wejść
-                    Text(
-                      "Nieudane Wejścia - ${widget.zone.location}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 300,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: LineChart(
-                          buildLineChartData(
-                            failedEntriesFrequency,
-                            Colors.redAccent,
-                            "Nieudanych wejść",
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 300,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: LineChart(
+                              buildLineChartData(
+                                entriesFrequency.value,
+                                Colors.blueAccent,
+                                "Wejść",
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 30),
+                        // Failed Entries Chart
+                        Text(
+                          "Nieudane Wejścia - ${accessZoneAsyncValue.asData?.value.location ?? ''}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 300,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: LineChart(
+                              buildLineChartData(
+                                failedEntriesFrequency.value,
+                                Colors.redAccent,
+                                "Nieudanych wejść",
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
     );
   }
 
@@ -143,26 +152,21 @@ class _DashboardPageState extends State<DashboardPage> {
   ) {
     return LineChartData(
       lineTouchData: LineTouchData(
-        enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          getTooltipItems: (touchedSpots) {
-            return touchedSpots.map((spot) {
-              final date = frequency.keys.elementAt(spot.x.toInt());
-              final value = spot.y.toInt();
-              return LineTooltipItem(
-                "$date\n$value $tooltipSuffix",
-                const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
-            }).toList();
-          },
+          getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
+            final date = frequency.keys.elementAt(spot.x.toInt());
+            final value = spot.y.toInt();
+            return LineTooltipItem(
+              "$date\n$value $tooltipSuffix",
+              const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          }).toList(),
         ),
       ),
       gridData: FlGridData(
-        show: true,
-        drawVerticalLine: true,
         getDrawingHorizontalLine: (value) => FlLine(
           color: Colors.grey.shade300,
           strokeWidth: 1,
@@ -209,15 +213,13 @@ class _DashboardPageState extends State<DashboardPage> {
             },
           ),
         ),
-        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        rightTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(),
+        rightTitles: const AxisTitles(),
       ),
       borderData: FlBorderData(
         show: true,
         border: Border.all(
           color: Colors.grey.shade300,
-          width: 1,
         ),
       ),
       lineBarsData: [
@@ -233,7 +235,6 @@ class _DashboardPageState extends State<DashboardPage> {
           isCurved: true,
           color: lineColor,
           barWidth: 3,
-          dotData: const FlDotData(show: true),
         ),
       ],
       minX: 0,

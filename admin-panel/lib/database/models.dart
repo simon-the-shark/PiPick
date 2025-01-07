@@ -7,14 +7,17 @@ class User {
 
   late String name;
   late String surname;
+
+  @Index(unique: true)
   late String phone;
+
   String? rfidCard;
 
   final admin = IsarLink<Admin>();
 
   final zones = IsarLinks<AccessZone>();
 
-  @Backlink(to: 'user')
+  @Backlink(to: "user")
   final logi = IsarLinks<Logs>();
 }
 
@@ -22,13 +25,17 @@ class User {
 class Admin {
   Id id = Isar.autoIncrement;
 
+  @Index(unique: true)
   late String login;
+
   late String password;
   late String name;
   late String surname;
+
+  @Index(unique: true)
   late String email;
 
-  @Backlink(to: 'admin')
+  @Backlink(to: "admin")
   final users = IsarLinks<User>();
 }
 
@@ -36,13 +43,16 @@ class Admin {
 class AccessZone {
   Id id = Isar.autoIncrement;
 
+  @Index(unique: true)
   late int number;
+
+  @Index(unique: true)
   late String location;
 
-  @Backlink(to: 'zones')
+  @Backlink(to: "zones")
   final users = IsarLinks<User>();
 
-  @Backlink(to: 'zone')
+  @Backlink(to: "zone")
   final logs = IsarLinks<Logs>();
 }
 
@@ -54,7 +64,9 @@ class Logs {
 
   final zone = IsarLink<AccessZone>();
 
+  @Index()
   late DateTime timestamp;
+
   late bool successful;
   String? rfidCard;
 }
