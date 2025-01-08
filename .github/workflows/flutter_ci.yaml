@@ -29,8 +29,8 @@ jobs:
       # - name: Example .env
       #   run: cp example.env .env
 
-      # - name: generate files
-      #   run: dart run build_runner build --delete-conflicting-outputs
+      - name: generate files
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .

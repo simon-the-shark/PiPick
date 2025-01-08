@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import "package:flutter/material.dart";
 import "package:isar/isar.dart";
 import "package:path_provider/path_provider.dart";
