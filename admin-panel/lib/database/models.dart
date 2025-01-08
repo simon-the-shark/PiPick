@@ -1,4 +1,5 @@
 import "package:isar/isar.dart";
+
 part "models.g.dart";
 
 @collection
@@ -13,9 +14,9 @@ class User {
 
   String? rfidCard;
 
-  final admin = IsarLink<Admin>();
+  final createdBy = IsarLink<Admin>();
 
-  final zones = IsarLinks<AccessZone>();
+  final allowedZones = IsarLinks<AccessZone>();
 
   @Backlink(to: "user")
   final logi = IsarLinks<Logs>();
@@ -35,8 +36,8 @@ class Admin {
   @Index(unique: true)
   late String email;
 
-  @Backlink(to: "admin")
-  final users = IsarLinks<User>();
+  @Backlink(to: "createdBy")
+  final usersCreated = IsarLinks<User>();
 }
 
 @collection
@@ -49,8 +50,8 @@ class AccessZone {
   @Index(unique: true)
   late String location;
 
-  @Backlink(to: "zones")
-  final users = IsarLinks<User>();
+  @Backlink(to: "allowedZones")
+  final zoneAllowedUsers = IsarLinks<User>();
 
   @Backlink(to: "zone")
   final logs = IsarLinks<Logs>();

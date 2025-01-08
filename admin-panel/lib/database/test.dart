@@ -32,11 +32,11 @@ Future<void> main() async {
       ..phone = "123-456-789"
       ..rfidCard = "RFID123456";
 
-    user.admin.value = admin;
-    admin.users.add(user);
+    user.createdBy.value = admin;
+    admin.usersCreated.add(user);
 
     await isar.users.put(user);
-    await admin.users.save();
+    await admin.usersCreated.save();
 
     final strefa = AccessZone()
       ..number = 1
@@ -44,11 +44,11 @@ Future<void> main() async {
 
     await isar.accessZones.put(strefa);
 
-    user.zones.add(strefa);
-    strefa.users.add(user);
+    user.allowedZones.add(strefa);
+    strefa.zoneAllowedUsers.add(user);
 
-    await user.zones.save();
-    await strefa.users.save();
+    await user.allowedZones.save();
+    await strefa.zoneAllowedUsers.save();
 
     final log = Logs()
       ..timestamp = DateTime.now()
@@ -91,7 +91,7 @@ Future<void> main() async {
   print("Admini:");
   for (final admin in admins) {
     print("ID: ${admin.id}, Login: ${admin.login}, Email: ${admin.email}");
-    for (final user in admin.users) {
+    for (final user in admin.usersCreated) {
       print(
         "  Użytkownik: ${user.name} ${user.surname}, Telefon: ${user.phone}",
       );
@@ -104,7 +104,7 @@ Future<void> main() async {
     print(
       "ID: ${user.id}, Name: ${user.name} ${user.surname}, Phone: ${user.phone}",
     );
-    for (final strefa in user.zones) {
+    for (final strefa in user.allowedZones) {
       print(
         "  Strefa: Numer ${strefa.number}, Lokalizacja: ${strefa.location}",
       );
