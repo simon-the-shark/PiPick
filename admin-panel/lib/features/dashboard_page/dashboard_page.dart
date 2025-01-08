@@ -3,7 +3,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../../database/models.dart";
 import "freq_chart.dart";
-import "logs_repository.dart";
+import "logs_by_zone_repository.dart";
 
 class DashboardPage extends HookConsumerWidget {
   const DashboardPage({

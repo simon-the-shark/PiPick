@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
-import "acces_zone_repository.dart";
+import "acces_zones_repository.dart";
 import "database/models.dart";
 import "features/dashboard_page/dashboard_page.dart";
 
@@ -18,13 +18,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // return MaterialApp(
+    //   title: "PiPick",
+    //   theme: ThemeData(primarySwatch: Colors.blue),
+    //   home: const LogsListPage(),
+    // );
     return MaterialApp(
       title: "PiPick",
       theme: ThemeData(primarySwatch: Colors.blue),
       home: Consumer(
         builder: (context, ref, _) {
-          final accessZone = ref.watch(accessZoneRepositoryProvider);
-          print(accessZone.value);
+          final accessZone = ref.watch(exampleAccessZoneRepositoryProvider);
           return switch (accessZone) {
             AsyncData(:final AccessZone value) =>
               DashboardPage(accessZone: value),

@@ -6,23 +6,23 @@ import "package:riverpod_annotation/riverpod_annotation.dart";
 import "../../database/models.dart";
 import "../../database/provider.dart";
 
-part "logs_repository.g.dart";
+part "logs_by_zone_repository.g.dart";
 
 @riverpod
-Future<List<Logs>> allLogs(Ref ref, int zoneId) async {
+Future<List<Logs>> allLogsByZone(Ref ref, int zoneId) async {
   final isar = await ref.watch(isarProvider.future);
   return isar.logs.filter().zone((q) => q.idEqualTo(zoneId)).findAll();
 }
 
 @riverpod
-FutureOr<List<Logs>> failedLogs(FailedLogsRef ref, int zoneId) async {
-  final allLogs = await ref.watch(allLogsProvider(zoneId).future);
+FutureOr<List<Logs>> failedLogsByZone(Ref ref, int zoneId) async {
+  final allLogs = await ref.watch(allLogsByZoneProvider(zoneId).future);
   return allLogs.where((log) => !log.successful).toList();
 }
 
 @riverpod
 FutureOr<Map<String, int>> entriesRequency(Ref ref, int zoneId) async {
-  final allLogs = await ref.watch(allLogsProvider(zoneId).future);
+  final allLogs = await ref.watch(allLogsByZoneProvider(zoneId).future);
   final freq = <String, int>{};
   for (final log in allLogs) {
     final day = DateFormat("yyyy-MM-dd").format(log.timestamp);
@@ -34,7 +34,7 @@ FutureOr<Map<String, int>> entriesRequency(Ref ref, int zoneId) async {
 
 @riverpod
 FutureOr<Map<String, int>> failedEntriesFrequency(Ref ref, int zoneId) async {
-  final failed = await ref.watch(failedLogsProvider(zoneId).future);
+  final failed = await ref.watch(failedLogsByZoneProvider(zoneId).future);
   final failedFreq = <String, int>{};
   for (final log in failed) {
     final day = DateFormat("yyyy-MM-dd").format(log.timestamp);
