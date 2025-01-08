@@ -60,8 +60,8 @@ dev_dependencies:
   isar_generator: ^3.1.0+1
   build_runner: ^2.4.13
   riverpod_generator: ^2.4.0
-  # riverpod_lint: ^2.6.3
-  # custom_lint: ^0.7.0
+  # riverpod_lint: ^2.6.3 # dependencies conflict
+  # custom_lint: ^0.7.0 # dependencies conflict
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
