@@ -18,8 +18,6 @@ linter:
     sort_pub_dependencies: false
 
 analyzer:
-  errors:
-    avoid_print: ignore
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
