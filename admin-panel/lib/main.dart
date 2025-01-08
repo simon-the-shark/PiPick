@@ -1,9 +1,8 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
-import "acces_zones_repository.dart";
-import "database/models.dart";
-import "features/dashboard_page/dashboard_page.dart";
+import "features/users/presentation/users_list_page.dart";
+import "theme.dart";
 
 Future<void> main() async {
   runApp(
@@ -18,25 +17,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "PiPick",
+      theme: getTheme(),
+      home: const UsersListPage(),
+    );
     // return MaterialApp(
     //   title: "PiPick",
     //   theme: ThemeData(primarySwatch: Colors.blue),
-    //   home: const LogsListPage(),
+    //   home: Consumer(
+    //     builder: (context, ref, _) {
+    //       final accessZone = ref.watch(exampleAccessZoneRepositoryProvider);
+    //       return switch (accessZone) {
+    //         AsyncData(:final AccessZone value) =>
+    //           DashboardPage(accessZone: value),
+    //         AsyncError(:final error) => Text("Error: $error"),
+    //         final _ => const Center(child: CircularProgressIndicator()),
+    //       };
+    //     },
+    //   ),
     // );
-    return MaterialApp(
-      title: "PiPick",
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: Consumer(
-        builder: (context, ref, _) {
-          final accessZone = ref.watch(exampleAccessZoneRepositoryProvider);
-          return switch (accessZone) {
-            AsyncData(:final AccessZone value) =>
-              DashboardPage(accessZone: value),
-            AsyncError(:final error) => Text("Error: $error"),
-            final _ => const Center(child: CircularProgressIndicator()),
-          };
-        },
-      ),
-    );
   }
 }
