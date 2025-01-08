@@ -1,9 +1,11 @@
+import "package:flutter/material.dart";
 import "package:isar/isar.dart";
 import "package:path_provider/path_provider.dart";
 
 import "models.dart";
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final dir = await getApplicationDocumentsDirectory();
 
   final isar = await Isar.open(
@@ -89,7 +91,8 @@ Future<void> main() async {
     print("ID: ${admin.id}, Login: ${admin.login}, Email: ${admin.email}");
     for (final user in admin.users) {
       print(
-          "  Użytkownik: ${user.name} ${user.surname}, Telefon: ${user.phone}");
+        "  Użytkownik: ${user.name} ${user.surname}, Telefon: ${user.phone}",
+      );
     }
   }
 
@@ -97,14 +100,14 @@ Future<void> main() async {
   print("\nUżytkownicy:");
   for (final user in users) {
     print(
-        "ID: ${user.id}, Name: ${user.name} ${user.surname}, Phone: ${user.phone}");
-    final userStrefy = await user.zones;
-    for (final strefa in userStrefy) {
+      "ID: ${user.id}, Name: ${user.name} ${user.surname}, Phone: ${user.phone}",
+    );
+    for (final strefa in user.zones) {
       print(
-          "  Strefa: Numer ${strefa.number}, Lokalizacja: ${strefa.location}");
+        "  Strefa: Numer ${strefa.number}, Lokalizacja: ${strefa.location}",
+      );
     }
-    final userLogi = await user.logi;
-    for (final log in userLogi) {
+    for (final log in user.logi) {
       print("  Log: Timestamp ${log.timestamp}, Czy udane: ${log.successful}");
     }
   }
