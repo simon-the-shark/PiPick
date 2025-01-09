@@ -86,5 +86,28 @@ ThemeData getTheme() {
         ),
       ),
     ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(
+          width: 2,
+        ),
+      ),
+      hintStyle: TextStyle(
+        color: Colors.grey.shade600,
+      ),
+      labelStyle: const TextStyle(
+        color: Colors.black,
+      ),
+      floatingLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+      ),
+    ),
   );
 }

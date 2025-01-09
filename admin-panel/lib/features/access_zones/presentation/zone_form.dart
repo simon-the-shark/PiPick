@@ -127,7 +127,10 @@ class _FormContent extends ConsumerWidget {
                 MyValidationMessage.unique: (_) =>
                     "Numer strefy musi być unikalny",
               },
-              decoration: const InputDecoration(labelText: "Numer strefy"),
+              decoration: const InputDecoration(
+                labelText: "Numer strefy",
+                hintText: "np. 1123",
+              ),
             ),
             ReactiveTextField<String>(
               formControl: formModel.locationControl,
@@ -135,7 +138,10 @@ class _FormContent extends ConsumerWidget {
                 ValidationMessage.required: (_) =>
                     "Opis miejsca strefy nie może być puste",
               },
-              decoration: const InputDecoration(labelText: "Lokalizacja/Nazwa"),
+              decoration: const InputDecoration(
+                labelText: "Lokalizacja/Nazwa",
+                hintText: "np. Biuro 1",
+              ),
               keyboardType: TextInputType.name,
             ),
             AllowedUsersSubform(formModel: formModel),
