@@ -3,6 +3,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 
 import "../../../database/models.dart";
 import "../data/users_repository.dart";
+import "user_form.dart";
 import "user_tile.dart";
 
 class UsersListPage extends ConsumerWidget {
@@ -13,7 +14,12 @@ class UsersListPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Users")),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () async {
+          await showDialog(
+            context: context,
+            builder: (context) => const UserFormDialog(),
+          );
+        },
         child: const Icon(Icons.add),
       ),
       body: const _UsersDataList(),
@@ -31,9 +37,9 @@ class _UsersDataList extends ConsumerWidget {
     return switch (users) {
       AsyncData(value: final List<User> users) => ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: users.length * 10,
+          itemCount: users.length,
           itemBuilder: (context, index) {
-            return UserTile(user: users[0]);
+            return UserTile(user: users[index]);
           },
         ),
       AsyncError(:final error) => Center(
