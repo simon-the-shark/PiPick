@@ -1,6 +1,7 @@
 import "dart:io";
 
 import "package:csv/csv.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:file_picker/file_picker.dart";
 
 import "../../../database/models.dart";
@@ -9,7 +10,7 @@ typedef ShowMessageFunction = void Function(String message);
 
 class CsvUtils {
   static Future<void> exportLogs(
-    List<Logs> logs,
+    IList<Logs> logs,
     ShowMessageFunction showMessageFunction,
   ) async {
     try {
@@ -28,7 +29,7 @@ class CsvUtils {
           log.zone.value?.number ?? "brak",
           if (log.successful) "Yes" else "No",
         ];
-      }).toList();
+      }).toIList();
 
       final csv = const ListToCsvConverter().convert([headers, ...data]);
 

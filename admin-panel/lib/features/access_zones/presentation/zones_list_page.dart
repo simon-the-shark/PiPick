@@ -1,4 +1,5 @@
 import "package:auto_route/auto_route.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
@@ -37,7 +38,7 @@ class _ZonesDataList extends ConsumerWidget {
     final zones = ref.watch(accessZonesRepositoryProvider);
 
     return switch (zones) {
-      AsyncData(value: final List<AccessZone> zones) => ListView.builder(
+      AsyncData(value: final IList<AccessZone> zones) => ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: zones.length,
           itemBuilder: (context, index) {

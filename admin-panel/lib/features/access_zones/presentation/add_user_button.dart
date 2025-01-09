@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 
@@ -14,7 +15,8 @@ class AddUserButton extends ConsumerWidget {
     Future<void> addUser() async {
       final users = await ref.read(usersRepositoryProvider.future);
       final alreadySelected =
-          formModel.allowedUsersControl.value?.whereType<User>().toList() ?? [];
+          formModel.allowedUsersControl.value?.whereType<User>().toIList() ??
+              const IList<User>.empty();
       if (!context.mounted) return;
       final user = await showDialog(
         context: context,

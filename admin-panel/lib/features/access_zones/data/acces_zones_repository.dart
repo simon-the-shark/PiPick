@@ -1,4 +1,5 @@
 import "package:collection/collection.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:isar/isar.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
@@ -10,12 +11,12 @@ part "acces_zones_repository.g.dart";
 @riverpod
 class AccessZonesRepository extends _$AccessZonesRepository {
   @override
-  FutureOr<List<AccessZone>> build() async {
+  Future<IList<AccessZone>> build() async {
     final isar = await ref.watch(isarProvider.future);
-    return isar.accessZones.where().findAll();
+    return (await isar.accessZones.where().findAll()).toIList();
   }
 
-  Future<void> putZone(AccessZone zone, [List<User>? allowedUsers]) async {
+  Future<void> putZone(AccessZone zone, [IList<User>? allowedUsers]) async {
     final isar = await ref.watch(isarProvider.future);
     await isar.writeTxn(() async {
       await isar.accessZones.put(zone);
@@ -27,7 +28,7 @@ class AccessZonesRepository extends _$AccessZonesRepository {
                 (allowedUser) => allowedUser.id == user.id,
               ),
             )
-            .toList();
+            .toIList();
         for (final user in usersToAdd) {
           user.allowedZones.add(zone);
           await user.allowedZones.save();
@@ -38,7 +39,7 @@ class AccessZonesRepository extends _$AccessZonesRepository {
               (user) =>
                   allowedUsers.none((allowedUser) => allowedUser.id == user.id),
             )
-            .toList();
+            .toIList();
         for (final user in usersToRemove) {
           user.allowedZones.remove(zone);
           await user.allowedZones.save();

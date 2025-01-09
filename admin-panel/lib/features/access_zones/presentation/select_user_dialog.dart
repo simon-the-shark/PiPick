@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:toastification/toastification.dart";
 
@@ -9,8 +10,8 @@ class SelectUserDialog extends StatelessWidget {
     required this.users,
     required this.alreadySelected,
   });
-  final List<User> users;
-  final List<User> alreadySelected;
+  final IList<User> users;
+  final IList<User> alreadySelected;
   @override
   Widget build(BuildContext context) {
     final alreadySelectedIds = alreadySelected.map((user) => user.id).toSet();

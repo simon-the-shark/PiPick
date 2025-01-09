@@ -1,4 +1,5 @@
 import "package:auto_route/auto_route.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
@@ -50,8 +51,8 @@ class _DasboardPageContent extends StatelessWidget {
   );
 
   final AccessZone accessZone;
-  final Map<String, int> entriesFrequency;
-  final Map<String, int> failedEntriesFrequency;
+  final IMap<String, int> entriesFrequency;
+  final IMap<String, int> failedEntriesFrequency;
 
   @override
   Widget build(BuildContext context) {
