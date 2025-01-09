@@ -3,6 +3,7 @@ import "dart:async";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
+import "package:isar/isar.dart";
 import "package:reactive_forms_annotations/reactive_forms_annotations.dart";
 
 import "../../../database/models.dart";
@@ -32,23 +33,30 @@ class UserForm with _$UserForm {
 }
 
 class UserFormDialog extends ConsumerWidget {
-  const UserFormDialog({super.key});
+  const UserFormDialog({
+    super.key,
+    this.initialData,
+  });
+
+  final User? initialData;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return UserFormFormBuilder(
       model: UserForm(
-        name: "",
-        surname: "",
-        phone: "",
+        name: initialData?.name ?? "",
+        surname: initialData?.surname ?? "",
+        phone: initialData?.phone ?? "",
+        rfidCard: initialData?.rfidCard,
       ),
       builder: (context, formModel, child) {
         Future<void> onSubmit() async {
           formModel.form.markAllAsTouched();
           if (formModel.form.valid) {
             unawaited(
-              ref.read(usersRepositoryProvider.notifier).addUser(
+              ref.read(usersRepositoryProvider.notifier).putUser(
                     User()
+                      ..id = initialData?.id ?? Isar.autoIncrement
                       ..name = formModel.nameControl.value!
                       ..surname = formModel.surnameControl.value!
                       ..phone = formModel.phoneControl.value!
@@ -66,7 +74,9 @@ class UserFormDialog extends ConsumerWidget {
         }
 
         return AlertDialog(
-          title: const Text("Add User"),
+          title: Text(
+            initialData == null ? "Dodaj użytkownika" : "Edytuj użytkownika",
+          ),
           content: SizedBox(
             width: MediaQuery.sizeOf(context).width * 0.8,
             child: Column(
