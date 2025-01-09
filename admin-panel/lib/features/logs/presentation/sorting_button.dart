@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:toastification/toastification.dart";
 
 class SortingButton extends StatelessWidget {
   const SortingButton({
@@ -16,11 +17,9 @@ class SortingButton extends StatelessWidget {
       ),
       tooltip: "Sort by Date",
       onPressed: () {
-        // Functionality not implemented
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Sort functionality not implemented"),
-          ),
+        toastification.show(
+          title: const Text("Sort functionality not implemented"),
+          autoCloseDuration: const Duration(seconds: 3),
         );
       },
     );

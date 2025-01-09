@@ -23,7 +23,6 @@ class SelectUserDialog extends StatelessWidget {
             onPressed: alreadySelectedIds.contains(user.id)
                 ? () {
                     toastification.show(
-                      context: context,
                       title: const Text("Ten użytkownik jest już dopuszczony"),
                       autoCloseDuration: const Duration(seconds: 1),
                     );
