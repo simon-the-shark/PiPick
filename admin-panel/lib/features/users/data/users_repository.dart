@@ -29,4 +29,11 @@ class UsersRepository extends _$UsersRepository {
     });
     ref.invalidateSelf();
   }
+
+  Future<bool> isPhoneUnique(String phone) async {
+    final isar = await ref.watch(isarProvider.future);
+    final existingUser =
+        await isar.users.filter().phoneEqualTo(phone).findFirst();
+    return existingUser == null;
+  }
 }

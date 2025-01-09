@@ -50,7 +50,7 @@ class ZoneFormDialog extends ConsumerWidget {
             (number) async {
               return ref
                   .read(accessZonesRepositoryProvider.notifier)
-                  .checkIfNumberIsUnique(int.parse(number));
+                  .isNumberUnique(int.parse(number));
             },
           ),
         ]);
