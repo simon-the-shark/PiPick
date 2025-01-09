@@ -1,8 +1,9 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:fl_chart/fl_chart.dart";
 import "package:flutter/material.dart";
 
 LineChartData buildLineChartData(
-  Map<String, int> frequency,
+  IMap<String, int> frequency,
   Color lineColor,
   String tooltipSuffix,
 ) {
@@ -83,7 +84,7 @@ LineChartData buildLineChartData(
         spots: frequency.entries
             .map(
               (e) => FlSpot(
-                frequency.keys.toList().indexOf(e.key).toDouble(),
+                frequency.keys.toIList().indexOf(e.key).toDouble(),
                 e.value.toDouble(),
               ),
             )

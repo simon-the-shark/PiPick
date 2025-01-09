@@ -1,5 +1,6 @@
 import "dart:async";
 
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
@@ -92,7 +93,9 @@ class _FormContent extends ConsumerWidget {
                   ..id = initialData?.id ?? Isar.autoIncrement
                   ..location = formModel.locationControl.value!
                   ..number = int.parse(formModel.numberControl.value!),
-                formModel.allowedUsersControl.value?.whereType<User>().toList(),
+                formModel.allowedUsersControl.value
+                    ?.whereType<User>()
+                    .toIList(),
               ),
         );
         Navigator.of(context).pop();

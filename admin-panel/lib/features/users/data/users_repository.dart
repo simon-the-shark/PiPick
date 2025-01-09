@@ -1,3 +1,4 @@
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:isar/isar.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
@@ -9,9 +10,9 @@ part "users_repository.g.dart";
 @riverpod
 class UsersRepository extends _$UsersRepository {
   @override
-  Future<List<User>> build() async {
+  Future<IList<User>> build() async {
     final isar = await ref.watch(isarProvider.future);
-    return isar.users.where().findAll();
+    return (await isar.users.where().findAll()).toIList();
   }
 
   Future<void> putUser(User user) async {

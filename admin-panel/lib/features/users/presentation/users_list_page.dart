@@ -1,4 +1,5 @@
 import "package:auto_route/auto_route.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 
@@ -37,7 +38,7 @@ class _UsersDataList extends ConsumerWidget {
     final users = ref.watch(usersRepositoryProvider);
 
     return switch (users) {
-      AsyncData(value: final List<User> users) => ListView.builder(
+      AsyncData(value: final IList<User> users) => ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: users.length,
           itemBuilder: (context, index) {
