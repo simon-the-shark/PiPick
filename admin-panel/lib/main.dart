@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
-import "features/users/presentation/users_list_page.dart";
+import "features/access_zones/presentation/zones_list_page.dart";
 import "theme.dart";
 
 Future<void> main() async {
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "PiPick",
       theme: getTheme(),
-      home: const UsersListPage(),
+      home: const AccessZonesListPage(),
     );
     // return MaterialApp(
     //   title: "PiPick",
