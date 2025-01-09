@@ -16,11 +16,9 @@ Future<IList<Logs>> allLogsRepository(Ref ref) async {
 }
 
 @riverpod
-Future<IList<Logs>> logsByZoneRepository(Ref ref, int zoneNumber) async {
+Future<IList<Logs>> logsByZoneRepository(Ref ref, int zoneId) async {
   final isar = await ref.watch(isarProvider.future);
-  return (await isar.logs
-          .filter()
-          .zone((q) => q.numberEqualTo(zoneNumber))
-          .findAll())
-      .toIList();
+  final logs =
+      await isar.logs.filter().zone((q) => q.idEqualTo(zoneId)).findAll();
+  return logs.toIList();
 }
