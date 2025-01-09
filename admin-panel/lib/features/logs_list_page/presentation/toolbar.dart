@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
-import "../../../acces_zones_repository.dart";
 import "../../../database/models.dart";
+import "../../access_zones/data/acces_zones_repository.dart";
 
 class Toolbar extends ConsumerWidget implements PreferredSizeWidget {
   const Toolbar({
@@ -19,7 +19,7 @@ class Toolbar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final accessZones = ref.watch(allAccessZonesRepositoryProvider);
+    final accessZones = ref.watch(accessZonesRepositoryProvider);
     return Padding(
       padding: const EdgeInsets.all(8),
       child: accessZones.when(
