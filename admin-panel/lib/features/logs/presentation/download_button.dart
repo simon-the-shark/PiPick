@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../business/csv_export.dart";
-import "../data/all_logs_repository.dart";
+import "../data/logs_repository.dart";
 
 class DownloadButton extends ConsumerWidget {
   const DownloadButton({
