@@ -1,4 +1,5 @@
 // logs_list_page.dart
+import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -9,6 +10,7 @@ import "download_button.dart";
 import "sorting_button.dart";
 import "toolbar.dart";
 
+@RoutePage()
 class LogsListPage extends HookConsumerWidget {
   const LogsListPage({super.key});
 

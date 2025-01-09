@@ -1,7 +1,11 @@
+import "dart:async";
+
+import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../../../database/models.dart";
+import "../../../router.gr.dart";
 import "../../../widgets/delete_confirmation.dart";
 import "../data/acces_zones_repository.dart";
 import "zone_form.dart";
@@ -36,6 +40,14 @@ class ZoneTile extends ConsumerWidget {
       }
     }
 
+    Future<void> onDashboardNavigate() async {
+      unawaited(
+        context.router.push(
+          DashboardRoute(accessZone: zone),
+        ),
+      );
+    }
+
     return Card(
       child: ListTile(
         leading: const Icon(Icons.location_on),
@@ -53,7 +65,7 @@ class ZoneTile extends ConsumerWidget {
             Tooltip(
               message: "Wykresy strefy",
               child: IconButton(
-                onPressed: () {},
+                onPressed: onDashboardNavigate,
                 icon: const Icon(Icons.bar_chart),
               ),
             ),
