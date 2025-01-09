@@ -9,6 +9,7 @@ import "package:reactive_forms_annotations/reactive_forms_annotations.dart";
 import "../../../database/models.dart";
 import "../../../utils/unique_db_form_validator.dart";
 import "../data/acces_zones_repository.dart";
+import "allowed_sers_subform.dart";
 
 part "zone_form.freezed.dart";
 part "zone_form.gform.dart";
@@ -30,6 +31,7 @@ class ZoneForm with _$ZoneForm {
       validators: [RequiredValidator()],
     )
     required String location,
+    @RfArray() required List<User> allowedUsers,
   }) = _ZoneForm;
 }
 
@@ -58,75 +60,95 @@ class ZoneFormDialog extends ConsumerWidget {
       model: ZoneForm(
         number: initialData?.number.toString() ?? "",
         location: initialData?.location ?? "",
+        allowedUsers: initialData?.zoneAllowedUsers.toList() ?? [],
       ),
       builder: (context, formModel, child) {
-        Future<void> onSubmit() async {
-          formModel.form.markAllAsTouched();
-          if (formModel.form.valid) {
-            unawaited(
-              ref.read(accessZonesRepositoryProvider.notifier).putZone(
-                    AccessZone()
-                      ..id = initialData?.id ?? Isar.autoIncrement
-                      ..location = formModel.locationControl.value!
-                      ..number = int.parse(formModel.numberControl.value!),
-                  ),
-            );
-            Navigator.of(context).pop();
-          }
-        }
-
-        void onCancel() {
-          Navigator.of(context).pop();
-        }
-
-        return AlertDialog(
-          title: Text(
-            initialData == null
-                ? "Dodaj strefę dostępu"
-                : "Edytuj strefę dostępu",
-          ),
-          content: SizedBox(
-            width: MediaQuery.sizeOf(context).width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ReactiveTextField<String>(
-                  formControl: formModel.numberControl,
-                  validationMessages: {
-                    ValidationMessage.required: (_) =>
-                        "Numer strefy nie może być pusty",
-                    ValidationMessage.number: (_) =>
-                        "Numer strefy musi być dodatnią liczbą",
-                    MyValidationMessage.unique: (_) =>
-                        "Numer strefy musi być unikalny",
-                  },
-                  decoration: const InputDecoration(labelText: "Numer strefy"),
-                ),
-                ReactiveTextField<String>(
-                  formControl: formModel.locationControl,
-                  validationMessages: {
-                    ValidationMessage.required: (_) =>
-                        "Opis miejsca strefy nie może być puste",
-                  },
-                  decoration:
-                      const InputDecoration(labelText: "Lokalizacja/Nazwa"),
-                  keyboardType: TextInputType.name,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: onCancel,
-              child: const Text("Anuluj"),
-            ),
-            TextButton(
-              onPressed: onSubmit,
-              child: const Text("Zapisz"),
-            ),
-          ],
+        return _FormContent(
+          formModel: formModel,
+          initialData: initialData,
         );
       },
+    );
+  }
+}
+
+class _FormContent extends ConsumerWidget {
+  const _FormContent({
+    required this.formModel,
+    required this.initialData,
+  });
+
+  final ZoneFormForm formModel;
+  final AccessZone? initialData;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> onSubmit() async {
+      formModel.form.markAllAsTouched();
+      if (formModel.form.valid) {
+        unawaited(
+          ref.read(accessZonesRepositoryProvider.notifier).putZone(
+                AccessZone()
+                  ..id = initialData?.id ?? Isar.autoIncrement
+                  ..location = formModel.locationControl.value!
+                  ..number = int.parse(formModel.numberControl.value!),
+                formModel.allowedUsersControl.value?.whereType<User>().toList(),
+              ),
+        );
+        Navigator.of(context).pop();
+      }
+    }
+
+    void onCancel() {
+      Navigator.of(context).pop();
+    }
+
+    return AlertDialog(
+      title: Text(
+        initialData == null ? "Dodaj strefę dostępu" : "Edytuj strefę dostępu",
+      ),
+      scrollable: true,
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width * 0.8,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 24,
+          children: [
+            ReactiveTextField<String>(
+              formControl: formModel.numberControl,
+              validationMessages: {
+                ValidationMessage.required: (_) =>
+                    "Numer strefy nie może być pusty",
+                ValidationMessage.number: (_) =>
+                    "Numer strefy musi być dodatnią liczbą",
+                MyValidationMessage.unique: (_) =>
+                    "Numer strefy musi być unikalny",
+              },
+              decoration: const InputDecoration(labelText: "Numer strefy"),
+            ),
+            ReactiveTextField<String>(
+              formControl: formModel.locationControl,
+              validationMessages: {
+                ValidationMessage.required: (_) =>
+                    "Opis miejsca strefy nie może być puste",
+              },
+              decoration: const InputDecoration(labelText: "Lokalizacja/Nazwa"),
+              keyboardType: TextInputType.name,
+            ),
+            AllowedUsersSubform(formModel: formModel),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: onCancel,
+          child: const Text("Anuluj"),
+        ),
+        TextButton(
+          onPressed: onSubmit,
+          child: const Text("Zapisz"),
+        ),
+      ],
     );
   }
 }

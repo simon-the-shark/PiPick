@@ -61,9 +61,14 @@ class UserTile extends ConsumerWidget {
               message:
                   "Liczba dozwolonych stref dostępu: ${user.allowedZones.length}",
               child: TextButton.icon(
-                onPressed: () {},
+                onPressed: null,
                 icon: const Icon(Icons.incomplete_circle_sharp),
-                label: Text(user.allowedZones.length.toString()),
+                label: Text(
+                  user.allowedZones.length.toString(),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
+                ),
               ),
             ),
           ],

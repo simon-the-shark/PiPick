@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:isar/isar.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
@@ -14,10 +15,35 @@ class AccessZonesRepository extends _$AccessZonesRepository {
     return isar.accessZones.where().findAll();
   }
 
-  Future<void> putZone(AccessZone zone) async {
+  Future<void> putZone(AccessZone zone, [List<User>? allowedUsers]) async {
     final isar = await ref.watch(isarProvider.future);
     await isar.writeTxn(() async {
       await isar.accessZones.put(zone);
+      await zone.zoneAllowedUsers.load();
+      if (allowedUsers != null) {
+        final usersToAdd = allowedUsers
+            .where(
+              (user) => zone.zoneAllowedUsers.none(
+                (allowedUser) => allowedUser.id == user.id,
+              ),
+            )
+            .toList();
+        for (final user in usersToAdd) {
+          user.allowedZones.add(zone);
+          await user.allowedZones.save();
+        }
+
+        final usersToRemove = zone.zoneAllowedUsers
+            .where(
+              (user) =>
+                  allowedUsers.none((allowedUser) => allowedUser.id == user.id),
+            )
+            .toList();
+        for (final user in usersToRemove) {
+          user.allowedZones.remove(zone);
+          await user.allowedZones.save();
+        }
+      }
     });
     ref.invalidateSelf();
   }
