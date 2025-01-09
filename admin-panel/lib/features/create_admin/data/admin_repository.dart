@@ -23,17 +23,13 @@ class AdminRepository extends _$AdminRepository {
     ref.invalidateSelf();
   }
 
-  //isEmailUnique
   Future<bool> isEmailUnique(String email) async {
     final isar = await ref.watch(isarProvider.future);
     return (await isar.admins.where().emailEqualTo(email).findAll()).isEmpty;
   }
 
-
-  //isLoginUnique
   Future<bool> isLoginUnique(String login) async {
     final isar = await ref.watch(isarProvider.future);
     return (await isar.admins.where().loginEqualTo(login).findAll()).isEmpty;
   }
-
 }

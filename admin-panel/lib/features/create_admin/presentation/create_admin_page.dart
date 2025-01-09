@@ -9,7 +9,7 @@ class CreateAdminPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Admin"),
+        title: const Text("Dodaj admina"),
       ),
       body: const Center(
         child: SingleChildScrollView(

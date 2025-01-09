@@ -1,6 +1,5 @@
 import "dart:async";
 
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
@@ -8,6 +7,7 @@ import "package:isar/isar.dart";
 import "package:reactive_forms_annotations/reactive_forms_annotations.dart";
 
 import "../../../database/models.dart";
+import "../../../utils/equal_db_form_validator.dart";
 import "../../../utils/unique_db_form_validator.dart";
 import "../data/admin_repository.dart";
 
@@ -25,7 +25,12 @@ class AdminForm with _$AdminForm {
       ],
     )
     required String password,
-    
+    @RfControl(
+      validators: [
+        RequiredValidator(),
+      ],
+    )
+    required String repeatPassword,
     @RfControl(
       validators: [
         RequiredValidator(),
@@ -33,19 +38,16 @@ class AdminForm with _$AdminForm {
       ],
     )
     required String email,
-    
     @RfControl(
       validators: [
         RequiredValidator(),
       ],
     )
     required String login,
-    
     @RfControl(
       validators: [RequiredValidator()],
     )
     required String name,
-    
     @RfControl(
       validators: [RequiredValidator()],
     )
@@ -74,7 +76,6 @@ class AdminFormDialog extends ConsumerWidget {
             },
           ),
         ]);
-
         formModel.emailControl.setAsyncValidators([
           UniqueDbFormValidator(
             (email) async {
@@ -84,10 +85,14 @@ class AdminFormDialog extends ConsumerWidget {
             },
           ),
         ]);
+        formModel.repeatPasswordControl.setValidators([
+          EqualDbFormValidator(formModel.passwordControl),
+        ]);
       },
       model: AdminForm(
         login: initialData?.login ?? "",
-        password: "", // Nie wypełniamy hasła przy edycji
+        password: "",
+        repeatPassword: "",
         email: initialData?.email ?? "",
         name: initialData?.name ?? "",
         surname: initialData?.surname ?? "",
@@ -120,13 +125,22 @@ class _FormContent extends ConsumerWidget {
         final admin = Admin()
           ..id = initialData?.id ?? Isar.autoIncrement
           ..login = formModel.loginControl.value!
-          ..password = formModel.passwordControl.value! // Upewnij się, że hasło jest odpowiednio haszowane
+          ..password = formModel.passwordControl.value!
           ..email = formModel.emailControl.value!
           ..name = formModel.nameControl.value!
           ..surname = formModel.surnameControl.value!;
 
         await adminRepository.putAdmin(admin);
-        Navigator.of(context).pop();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Pomyślnie dodano administratora."),
+              duration: Duration(seconds: 3),
+            ),
+          );
+
+          Navigator.of(context).pop();
+        }
       }
     }
 
@@ -147,21 +161,19 @@ class _FormContent extends ConsumerWidget {
             ReactiveTextField<String>(
               formControl: formModel.loginControl,
               validationMessages: {
-                ValidationMessage.required: (_) =>
-                    "Login nie może być pusty",
-                MyValidationMessage.unique: (_) =>
-                    "Login musi być unikalny",
+                ValidationMessage.required: (_) => "Login nie może być pusty",
+                MyValidationMessage.unique: (_) => "Login musi być unikalny",
               },
               decoration: const InputDecoration(
                 labelText: "Login",
                 hintText: "np. admin123",
               ),
             ),
+            const SizedBox(height: 16),
             ReactiveTextField<String>(
               formControl: formModel.passwordControl,
               validationMessages: {
-                ValidationMessage.required: (_) =>
-                    "Hasło nie może być puste",
+                ValidationMessage.required: (_) => "Hasło nie może być puste",
                 ValidationMessage.minLength: (error) =>
                     "Hasło musi mieć co najmniej 6 znaków",
               },
@@ -171,15 +183,27 @@ class _FormContent extends ConsumerWidget {
               ),
               obscureText: true,
             ),
+            const SizedBox(height: 16),
+            ReactiveTextField<String>(
+              formControl: formModel.repeatPasswordControl,
+              validationMessages: {
+                ValidationMessage.required: (_) => "Należy powtórzyć hasło",
+                EqualValidationMessage.equal: (_) =>
+                    "Hasła muszą być takie same",
+              },
+              decoration: const InputDecoration(
+                labelText: "Powtórz hasło",
+                hintText: "Powtórz hasło",
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16),
             ReactiveTextField<String>(
               formControl: formModel.emailControl,
               validationMessages: {
-                ValidationMessage.required: (_) =>
-                    "Email nie może być pusty",
-                ValidationMessage.email: (_) =>
-                    "Nieprawidłowy format email",
-                MyValidationMessage.unique: (_) =>
-                    "Email musi być unikalny",
+                ValidationMessage.required: (_) => "Email nie może być pusty",
+                ValidationMessage.email: (_) => "Nieprawidłowy format email",
+                MyValidationMessage.unique: (_) => "Email musi być unikalny",
               },
               decoration: const InputDecoration(
                 labelText: "Email",
@@ -187,11 +211,11 @@ class _FormContent extends ConsumerWidget {
               ),
               keyboardType: TextInputType.emailAddress,
             ),
+            const SizedBox(height: 16),
             ReactiveTextField<String>(
               formControl: formModel.nameControl,
               validationMessages: {
-                ValidationMessage.required: (_) =>
-                    "Imię nie może być puste",
+                ValidationMessage.required: (_) => "Imię nie może być puste",
               },
               decoration: const InputDecoration(
                 labelText: "Imię",
@@ -199,6 +223,7 @@ class _FormContent extends ConsumerWidget {
               ),
               keyboardType: TextInputType.name,
             ),
+            const SizedBox(height: 16),
             ReactiveTextField<String>(
               formControl: formModel.surnameControl,
               validationMessages: {
