@@ -24,10 +24,14 @@ class NavCard extends StatelessWidget {
         },
         child: Center(
           child: Column(
+            spacing: 8,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon),
-              Text(label),
+              Icon(icon, size: 28),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ],
           ),
         ),

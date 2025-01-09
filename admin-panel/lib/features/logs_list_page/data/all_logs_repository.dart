@@ -13,3 +13,9 @@ Future<List<Logs>> allLogsRepository(Ref ref) async {
   // POTEZNY QUERRY final test = await isar.logs.filter().zone((q) => q.numberEqualTo(10)).user((q) => q.nameEqualTo("Anna")).timestampBetween(lower, upper).sortByTimestamp().findAll();
   return isar.logs.where().findAll();
 }
+
+@riverpod
+Future<List<Logs>> logsByZoneRepository(Ref ref, int zoneNumber) async {
+  final isar = await ref.watch(isarProvider.future);
+  return isar.logs.filter().zone((q) => q.numberEqualTo(zoneNumber)).findAll();
+}

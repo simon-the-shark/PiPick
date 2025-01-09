@@ -18,20 +18,20 @@ class HomePage extends StatelessWidget {
         crossAxisCount: 2,
         childAspectRatio: 4,
         padding: const EdgeInsets.all(16),
-        children: const [
-          NavCard(
+        children: [
+          const NavCard(
             icon: Icons.map,
             label: "Strefy dostępu",
             route: AccessZonesListRoute(),
           ),
-          NavCard(
+          const NavCard(
             icon: Icons.people,
             label: "Użytkownicy",
             route: UsersListRoute(),
           ),
           NavCard(
             icon: Icons.access_time,
-            label: "Logi",
+            label: "Wszystkie Logi",
             route: LogsListRoute(),
           ),
         ],
