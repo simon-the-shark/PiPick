@@ -9,11 +9,12 @@ class Toolbar extends ConsumerWidget implements PreferredSizeWidget {
     super.key,
     required this.selectedZone,
     required this.showFailed,
+    this.showZoneFilter = true,
   });
 
   final ValueNotifier<AccessZone?> selectedZone;
   final ValueNotifier<bool> showFailed;
-
+  final bool showZoneFilter;
   @override
   Size get preferredSize => const Size.fromHeight(60);
 
@@ -31,31 +32,27 @@ class Toolbar extends ConsumerWidget implements PreferredSizeWidget {
           }
           return Row(
             children: [
-              const Text("Filter by Zone: "),
-              DropdownButton<AccessZone>(
-                value: selectedZone.value,
-                hint: const Text("All Zones"),
-                items: [
-                  const DropdownMenuItem<AccessZone>(
-                    child: Text("All Zones"),
-                  ),
-                  ...zones.map((zone) {
-                    return DropdownMenuItem<AccessZone>(
-                      value: zone,
-                      child: Text("Zone ${zone.number}"),
-                    );
-                  }),
-                ],
-                onChanged: (zone) {
-                  // Functionality not implemented
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Filter functionality not implemented"),
+              if (showZoneFilter) const Text("Filter by Zone: "),
+              if (showZoneFilter)
+                DropdownButton<AccessZone>(
+                  value: selectedZone.value,
+                  hint: const Text("All Zones"),
+                  items: [
+                    const DropdownMenuItem<AccessZone>(
+                      child: Text("All Zones"),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(width: 20),
+                    ...zones.map((zone) {
+                      return DropdownMenuItem<AccessZone>(
+                        value: zone,
+                        child: Text("Zone ${zone.number}"),
+                      );
+                    }),
+                  ],
+                  onChanged: (zone) {
+                    selectedZone.value = zone;
+                  },
+                ),
+              if (showZoneFilter) const SizedBox(width: 20),
               Row(
                 children: [
                   Checkbox(

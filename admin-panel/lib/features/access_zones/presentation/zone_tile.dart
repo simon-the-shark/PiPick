@@ -48,6 +48,14 @@ class ZoneTile extends ConsumerWidget {
       );
     }
 
+    Future<void> onLogsListNavigate() async {
+      unawaited(
+        context.router.push(
+          LogsListRoute(initialFilterByZone: zone),
+        ),
+      );
+    }
+
     return Card(
       child: ListTile(
         leading: const Icon(Icons.location_on),
@@ -60,7 +68,10 @@ class ZoneTile extends ConsumerWidget {
           children: [
             Tooltip(
               message: "Logi strefy",
-              child: IconButton(onPressed: () {}, icon: const Icon(Icons.list)),
+              child: IconButton(
+                onPressed: onLogsListNavigate,
+                icon: const Icon(Icons.list),
+              ),
             ),
             Tooltip(
               message: "Wykresy strefy",

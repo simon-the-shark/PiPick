@@ -12,24 +12,37 @@ import "toolbar.dart";
 
 @RoutePage()
 class LogsListPage extends HookConsumerWidget {
-  const LogsListPage({super.key});
-
+  const LogsListPage({
+    super.key,
+    this.initialFilterByZone,
+  });
+  final AccessZone? initialFilterByZone;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allLogs = ref.watch(allLogsRepositoryProvider);
+    final selectedZone = useState<AccessZone?>(initialFilterByZone);
+
+    final allLogs = ref.watch(
+      selectedZone.value != null
+          ? logsByZoneRepositoryProvider(selectedZone.value!.id)
+          : allLogsRepositoryProvider,
+    );
 
     final isAscending = useState<bool>(true);
-    final selectedZone = useState<AccessZone?>(null);
     final showFailed = useState<bool>(false);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Historia wejść/wyjść"),
+        title: Text(
+          initialFilterByZone == null
+              ? "Cała historia wejść/wyjść"
+              : "Historia wejść/wyjść dla strefy ${initialFilterByZone!.number}: ${initialFilterByZone!.location}",
+        ),
         actions: [
           SortingButton(isAscending: isAscending),
           const DownloadButton(),
         ],
         bottom: Toolbar(
+          showZoneFilter: initialFilterByZone == null,
           selectedZone: selectedZone,
           showFailed: showFailed,
         ),
