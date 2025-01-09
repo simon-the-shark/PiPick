@@ -3,6 +3,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../../../database/models.dart";
 import "../data/acces_zones_repository.dart";
+import "zone_form.dart";
 import "zone_tile.dart";
 
 class AccessZonesListPage extends StatelessWidget {
@@ -14,10 +15,10 @@ class AccessZonesListPage extends StatelessWidget {
       appBar: AppBar(title: const Text("Strefy dostępu")),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // await showDialog(
-          //   context: context,
-          //   builder: (context) => const UserFormDialog(),
-          // );
+          await showDialog(
+            context: context,
+            builder: (context) => const ZoneFormDialog(),
+          );
         },
         child: const Icon(Icons.add),
       ),
