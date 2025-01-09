@@ -34,6 +34,10 @@ class AppRouter extends RootStackRouter {
           path: "/dashboard",
           page: DashboardRoute.page,
         ),
+        AutoRoute(
+          path: "/admin",
+          page: CreateAdminRoute.page,
+        ),
       ];
 }
 
