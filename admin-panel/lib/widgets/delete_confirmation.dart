@@ -20,10 +20,14 @@ class DeleteConfirmationDialog extends StatelessWidget {
           },
           child: const Text("Anuluj"),
         ),
-        TextButton(
+        ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop(true);
           },
+          style: ButtonStyle(
+            backgroundColor:
+                WidgetStateProperty.all(Theme.of(context).colorScheme.error),
+          ),
           child: const Text("Usuń"),
         ),
       ],

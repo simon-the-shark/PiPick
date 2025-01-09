@@ -153,11 +153,25 @@ class _FormContent extends ConsumerWidget {
           onPressed: onCancel,
           child: const Text("Anuluj"),
         ),
-        TextButton(
-          onPressed: onSubmit,
-          child: const Text("Zapisz"),
-        ),
+        SubmitButton(onSubmit: onSubmit),
       ],
+    );
+  }
+}
+
+class SubmitButton extends StatelessWidget {
+  const SubmitButton({super.key, required this.onSubmit});
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return ReactiveZoneFormFormConsumer(
+      builder: (context, formModel, child) {
+        return ElevatedButton(
+          onPressed: formModel.form.valid ? onSubmit : null,
+          child: const Text("Zapisz"),
+        );
+      },
     );
   }
 }
