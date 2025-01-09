@@ -16,18 +16,18 @@ class LoginPage extends StatelessWidget {
       body: const Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16),
             child: Column(
               children: [
                 CustomTextField(
                   labelText: "Nazwa użytkownika",
                 ),
-                SizedBox(height: 16.0),
+                SizedBox(height: 16),
                 CustomTextField(
                   labelText: "Hasło",
                   obscureText: true,
                 ),
-                SizedBox(height: 32.0),
+                SizedBox(height: 32),
                 CustomButton(
                   text: "Zaloguj",
                   route: [HomeRoute()],
