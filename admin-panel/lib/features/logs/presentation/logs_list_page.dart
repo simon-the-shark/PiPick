@@ -5,7 +5,7 @@ import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../../../database/models.dart";
-import "../data/all_logs_repository.dart";
+import "../data/logs_repository.dart";
 import "download_button.dart";
 import "sorting_button.dart";
 import "toolbar.dart";

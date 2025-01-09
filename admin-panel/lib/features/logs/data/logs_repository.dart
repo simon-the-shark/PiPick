@@ -6,7 +6,7 @@ import "package:riverpod_annotation/riverpod_annotation.dart";
 import "../../../database/models.dart";
 import "../../../database/provider.dart";
 
-part "all_logs_repository.g.dart";
+part "logs_repository.g.dart";
 
 @riverpod
 Future<IList<Logs>> allLogsRepository(Ref ref) async {
