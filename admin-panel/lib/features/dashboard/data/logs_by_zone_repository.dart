@@ -3,8 +3,8 @@ import "package:intl/intl.dart";
 import "package:isar/isar.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
-import "../../database/models.dart";
-import "../../database/provider.dart";
+import "../../../database/models.dart";
+import "../../../database/provider.dart";
 
 part "logs_by_zone_repository.g.dart";
 
