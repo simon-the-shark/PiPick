@@ -18,6 +18,7 @@ class NavCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () async {
           unawaited(context.router.push(route));

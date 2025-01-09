@@ -37,7 +37,12 @@ ThemeData getTheme() {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(Colors.purple.shade400),
+        backgroundColor: WidgetStateProperty.fromMap(
+          {
+            WidgetState.disabled: Colors.grey.shade600,
+            WidgetState.any: Colors.purple.shade400,
+          },
+        ),
         foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
         padding: WidgetStateProperty.all<EdgeInsets>(
           const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -47,13 +52,23 @@ ThemeData getTheme() {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        elevation: WidgetStateProperty.all<double>(8),
+        elevation: const WidgetStateProperty.fromMap(
+          {
+            WidgetState.disabled: 0,
+            WidgetState.any: 6,
+          },
+        ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all<Color>(Colors.transparent),
-        foregroundColor: WidgetStateProperty.all<Color>(Colors.purple),
+        foregroundColor: WidgetStateProperty.fromMap(
+          {
+            WidgetState.disabled: Colors.grey.shade500,
+            WidgetState.any: Colors.purple,
+          },
+        ),
         padding: WidgetStateProperty.all<EdgeInsets>(
           const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
@@ -69,9 +84,17 @@ ThemeData getTheme() {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all<Color>(Colors.transparent),
-        foregroundColor: WidgetStateProperty.all<Color>(Colors.purple),
-        side: WidgetStateProperty.all<BorderSide>(
-          const BorderSide(color: Colors.purple),
+        foregroundColor: WidgetStateProperty.fromMap(
+          {
+            WidgetState.disabled: Colors.grey.shade500,
+            WidgetState.any: Colors.purple,
+          },
+        ),
+        side: WidgetStateProperty.fromMap(
+          {
+            WidgetState.disabled: BorderSide(color: Colors.grey.shade500),
+            WidgetState.any: const BorderSide(color: Colors.purple),
+          },
         ),
         padding: WidgetStateProperty.all<EdgeInsets>(
           const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
