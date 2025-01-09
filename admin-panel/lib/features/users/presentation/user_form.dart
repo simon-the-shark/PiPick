@@ -93,6 +93,7 @@ class UserFormDialog extends ConsumerWidget {
             width: MediaQuery.sizeOf(context).width * 0.8,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              spacing: 18,
               children: [
                 ReactiveTextField<String>(
                   formControl: formModel.nameControl,
@@ -100,7 +101,10 @@ class UserFormDialog extends ConsumerWidget {
                     ValidationMessage.required: (_) =>
                         "Imię nie może być puste",
                   },
-                  decoration: const InputDecoration(labelText: "Imię"),
+                  decoration: const InputDecoration(
+                    labelText: "Imię",
+                    hintText: "np. Jan",
+                  ),
                   keyboardType: TextInputType.name,
                 ),
                 ReactiveTextField<String>(
@@ -109,7 +113,10 @@ class UserFormDialog extends ConsumerWidget {
                     ValidationMessage.required: (_) =>
                         "Nazwisko nie może być puste",
                   },
-                  decoration: const InputDecoration(labelText: "Nazwisko"),
+                  decoration: const InputDecoration(
+                    labelText: "Nazwisko",
+                    hintText: "np. Kowalski",
+                  ),
                   keyboardType: TextInputType.name,
                 ),
                 ReactiveTextField<String>(
@@ -120,12 +127,18 @@ class UserFormDialog extends ConsumerWidget {
                     MyValidationMessage.unique: (_) =>
                         "Telefon musi być unikalny",
                   },
-                  decoration: const InputDecoration(labelText: "Telefon"),
+                  decoration: const InputDecoration(
+                    labelText: "Telefon",
+                    hintText: "np. 123456789",
+                  ),
                   keyboardType: TextInputType.phone,
                 ),
                 ReactiveTextField<String>(
                   formControl: formModel.rfidCardControl,
-                  decoration: const InputDecoration(labelText: "Karta RFID"),
+                  decoration: const InputDecoration(
+                    labelText: "Karta RFID",
+                    hintText: "np. RFID123467",
+                  ),
                 ),
               ],
             ),
