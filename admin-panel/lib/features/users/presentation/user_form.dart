@@ -7,6 +7,7 @@ import "package:isar/isar.dart";
 import "package:reactive_forms_annotations/reactive_forms_annotations.dart";
 
 import "../../../database/models.dart";
+import "../../../utils/unique_db_form_validator.dart";
 import "../data/users_repository.dart";
 
 part "user_form.freezed.dart";
@@ -43,6 +44,17 @@ class UserFormDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return UserFormFormBuilder(
+      initState: (context, formModel) {
+        formModel.phoneControl.setAsyncValidators([
+          UniqueDbFormValidator(
+            (phone) async {
+              return ref
+                  .read(usersRepositoryProvider.notifier)
+                  .isPhoneUnique(phone);
+            },
+          ),
+        ]);
+      },
       model: UserForm(
         name: initialData?.name ?? "",
         surname: initialData?.surname ?? "",
@@ -105,6 +117,8 @@ class UserFormDialog extends ConsumerWidget {
                   validationMessages: {
                     ValidationMessage.required: (_) =>
                         "Telefon nie może być pusty",
+                    MyValidationMessage.unique: (_) =>
+                        "Telefon musi być unikalny",
                   },
                   decoration: const InputDecoration(labelText: "Telefon"),
                   keyboardType: TextInputType.phone,

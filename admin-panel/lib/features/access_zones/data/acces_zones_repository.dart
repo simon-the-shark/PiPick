@@ -30,7 +30,7 @@ class AccessZonesRepository extends _$AccessZonesRepository {
     ref.invalidateSelf();
   }
 
-  Future<bool> checkIfNumberIsUnique(int number) async {
+  Future<bool> isNumberUnique(int number) async {
     final isar = await ref.watch(isarProvider.future);
     final existingZone =
         await isar.accessZones.filter().numberEqualTo(number).findFirst();
