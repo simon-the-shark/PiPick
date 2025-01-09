@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
             icon: Icons.admin_panel_settings,
             label: "Dodaj Admina",
             route: CreateAdminRoute(),
-          )
+          ),
         ],
       ),
     );
