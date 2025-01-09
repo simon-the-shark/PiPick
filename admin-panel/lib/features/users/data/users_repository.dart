@@ -13,4 +13,12 @@ class UsersRepository extends _$UsersRepository {
     final isar = await ref.watch(isarProvider.future);
     return isar.users.where().findAll();
   }
+
+  Future<void> addUser(User user) async {
+    final isar = await ref.watch(isarProvider.future);
+    await isar.writeTxn(() async {
+      return isar.users.put(user);
+    });
+    ref.invalidateSelf();
+  }
 }

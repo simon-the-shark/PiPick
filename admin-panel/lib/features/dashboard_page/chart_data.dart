@@ -42,7 +42,7 @@ LineChartData buildLineChartData(
             if (index >= 0 && index < frequency.keys.length) {
               final text = frequency.keys.elementAt(index);
               return SideTitleWidget(
-                axisSide: meta.axisSide,
+                meta: meta,
                 child: Transform.rotate(
                   angle: -30 * 3.1415927 / 180,
                   child: Text(
