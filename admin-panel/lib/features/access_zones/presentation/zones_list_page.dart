@@ -1,3 +1,4 @@
+import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
@@ -6,6 +7,7 @@ import "../data/acces_zones_repository.dart";
 import "zone_form.dart";
 import "zone_tile.dart";
 
+@RoutePage()
 class AccessZonesListPage extends StatelessWidget {
   const AccessZonesListPage({super.key});
 

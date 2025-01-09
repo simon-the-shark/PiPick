@@ -1,3 +1,4 @@
+import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
@@ -5,6 +6,7 @@ import "../../../database/models.dart";
 import "../data/logs_by_zone_repository.dart";
 import "freq_chart.dart";
 
+@RoutePage()
 class DashboardPage extends HookConsumerWidget {
   const DashboardPage({
     super.key,
