@@ -4,7 +4,7 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../../../database/models.dart";
-import "../data/logs_by_zone_repository.dart";
+import "../data/frequencies_repositories.dart";
 import "freq_chart.dart";
 
 @RoutePage()

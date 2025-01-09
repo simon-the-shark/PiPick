@@ -1,30 +1,22 @@
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:intl/intl.dart";
-import "package:isar/isar.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
 import "../../../database/models.dart";
-import "../../../database/provider.dart";
+import "../../logs/data/logs_repository.dart";
 
-part "logs_by_zone_repository.g.dart";
-
-@riverpod
-Future<IList<Logs>> allLogsByZone(Ref ref, int zoneId) async {
-  final isar = await ref.watch(isarProvider.future);
-  return (await isar.logs.filter().zone((q) => q.idEqualTo(zoneId)).findAll())
-      .toIList();
-}
+part "frequencies_repositories.g.dart";
 
 @riverpod
 Future<IList<Logs>> failedLogsByZone(Ref ref, int zoneId) async {
-  final allLogs = await ref.watch(allLogsByZoneProvider(zoneId).future);
+  final allLogs = await ref.watch(logsByZoneRepositoryProvider(zoneId).future);
   return allLogs.where((log) => !log.successful).toIList();
 }
 
 @riverpod
 Future<IMap<String, int>> entriesRequency(Ref ref, int zoneId) async {
-  final allLogs = await ref.watch(allLogsByZoneProvider(zoneId).future);
+  final allLogs = await ref.watch(logsByZoneRepositoryProvider(zoneId).future);
   final freq = <String, int>{};
   for (final log in allLogs) {
     final day = DateFormat("yyyy-MM-dd").format(log.timestamp);
