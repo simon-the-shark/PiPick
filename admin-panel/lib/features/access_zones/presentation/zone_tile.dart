@@ -1,8 +1,12 @@
 import "package:flutter/material.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../../../database/models.dart";
+import "../../../widgets/delete_confirmation.dart";
+import "../data/acces_zones_repository.dart";
+import "zone_form.dart";
 
-class ZoneTile extends StatelessWidget {
+class ZoneTile extends ConsumerWidget {
   final AccessZone zone;
 
   const ZoneTile({
@@ -11,7 +15,27 @@ class ZoneTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> onEdit() async {
+      await showDialog(
+        context: context,
+        builder: (context) => ZoneFormDialog(initialData: zone),
+      );
+    }
+
+    Future<void> onDelete() async {
+      final confirm = await showDialog(
+        context: context,
+        builder: (context) =>
+            DeleteConfirmationDialog(itemName: "strefę ${zone.number}"),
+      );
+      if (confirm ?? false) {
+        await ref
+            .read(accessZonesRepositoryProvider.notifier)
+            .deleteZone(zone.id);
+      }
+    }
+
     return Card(
       child: ListTile(
         leading: const Icon(Icons.location_on),
@@ -37,14 +61,14 @@ class ZoneTile extends StatelessWidget {
               message: "Edytuj strefę",
               child: IconButton(
                 icon: const Icon(Icons.edit),
-                onPressed: () {},
+                onPressed: onEdit,
               ),
             ),
             Tooltip(
               message: "Usuń strefę",
               child: IconButton(
                 icon: const Icon(Icons.delete),
-                onPressed: () {},
+                onPressed: onDelete,
               ),
             ),
           ],
