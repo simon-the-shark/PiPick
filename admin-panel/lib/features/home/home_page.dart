@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 
@@ -38,6 +40,27 @@ class HomePage extends StatelessWidget {
             icon: Icons.admin_panel_settings,
             label: "Dodaj Admina",
             route: CreateAdminRoute(),
+          ),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () async {
+                unawaited(context.router.replaceAll([const LoginRoute()]));
+              },
+              child: Center(
+                child: Column(
+                  spacing: 8,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.logout, size: 28),
+                    Text(
+                      "Wyloguj się",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),

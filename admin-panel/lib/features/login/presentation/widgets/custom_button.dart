@@ -19,6 +19,14 @@ class CustomButton extends StatelessWidget {
       onPressed: () async {
         unawaited(context.router.replaceAll(route));
       },
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(
+            horizontal: 32,
+            vertical: 16,
+          ),
+        ),
+      ),
       child: Text(text),
     );
   }

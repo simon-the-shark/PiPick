@@ -1,21 +1,23 @@
 import "package:reactive_forms/reactive_forms.dart";
 
-class EqualValidationMessage {
-  static const equal = "equal";
+class NotEqualValidationMessage {
+  static const notEqual = "notEqual";
 }
 
-class EqualDbFormValidator extends Validator<dynamic> {
+class EqualAsOtherFormValidator extends Validator<dynamic> {
   final AbstractControl<dynamic> otherControl;
 
-  EqualDbFormValidator(this.otherControl);
+  EqualAsOtherFormValidator(this.otherControl);
 
   @override
   Map<String, dynamic>? validate(AbstractControl<dynamic> control) {
     final otherValue = otherControl.value;
-    final controlValue = control.value;
+    final thisValue = control.value;
 
-    if (otherValue != controlValue) {
-      return {EqualValidationMessage.equal: true};
+    if (otherValue != thisValue) {
+      return {
+        NotEqualValidationMessage.notEqual: false, // validation failed
+      };
     }
 
     return null;
