@@ -5,6 +5,7 @@ import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:isar/isar.dart";
 import "package:reactive_forms_annotations/reactive_forms_annotations.dart";
+import "package:toastification/toastification.dart";
 
 import "../../../database/models.dart";
 import "../../../utils/equal_db_form_validator.dart";
@@ -86,7 +87,7 @@ class AdminFormDialog extends ConsumerWidget {
           ),
         ]);
         formModel.repeatPasswordControl.setValidators([
-          EqualDbFormValidator(formModel.passwordControl),
+          EqualAsOtherFormValidator(formModel.passwordControl),
         ]);
       },
       model: AdminForm(
@@ -131,14 +132,11 @@ class _FormContent extends ConsumerWidget {
           ..surname = formModel.surnameControl.value!;
 
         await adminRepository.putAdmin(admin);
+        toastification.show(
+          title: const Text("Pomyślnie dodano administratora."),
+          autoCloseDuration: const Duration(seconds: 3),
+        );
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Pomyślnie dodano administratora."),
-              duration: Duration(seconds: 3),
-            ),
-          );
-
           Navigator.of(context).pop();
         }
       }
@@ -188,7 +186,7 @@ class _FormContent extends ConsumerWidget {
               formControl: formModel.repeatPasswordControl,
               validationMessages: {
                 ValidationMessage.required: (_) => "Należy powtórzyć hasło",
-                EqualValidationMessage.equal: (_) =>
+                NotEqualValidationMessage.notEqual: (_) =>
                     "Hasła muszą być takie same",
               },
               decoration: const InputDecoration(

@@ -2,7 +2,6 @@ import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "../../../router.gr.dart";
 import "widgets/custom_button.dart";
-import "widgets/custom_text_field.dart";
 
 @RoutePage()
 class LoginPage extends StatelessWidget {
@@ -19,12 +18,16 @@ class LoginPage extends StatelessWidget {
             padding: EdgeInsets.all(16),
             child: Column(
               children: [
-                CustomTextField(
-                  labelText: "Nazwa użytkownika",
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: "Nazwa użytkownika",
+                  ),
                 ),
                 SizedBox(height: 16),
-                CustomTextField(
-                  labelText: "Hasło",
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: "Hasło",
+                  ),
                   obscureText: true,
                 ),
                 SizedBox(height: 32),
