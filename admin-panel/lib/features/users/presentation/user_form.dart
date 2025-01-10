@@ -9,6 +9,7 @@ import "package:reactive_forms_annotations/reactive_forms_annotations.dart";
 import "../../../database/models.dart";
 import "../../../utils/unique_db_form_validator.dart";
 import "../data/users_repository.dart";
+import "rfid_field.dart";
 
 part "user_form.freezed.dart";
 part "user_form.gform.dart";
@@ -133,12 +134,8 @@ class UserFormDialog extends ConsumerWidget {
                   ),
                   keyboardType: TextInputType.phone,
                 ),
-                ReactiveTextField<String>(
-                  formControl: formModel.rfidCardControl,
-                  decoration: const InputDecoration(
-                    labelText: "Karta RFID",
-                    hintText: "np. RFID123467",
-                  ),
+                RfidField(
+                  rfidCardControl: formModel.rfidCardControl,
                 ),
               ],
             ),
