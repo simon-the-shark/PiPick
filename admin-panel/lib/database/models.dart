@@ -12,6 +12,7 @@ class User {
   @Index(unique: true)
   late String phone;
 
+  @Index(unique: true)
   String? rfidCard;
 
   final createdBy = IsarLink<Admin>();

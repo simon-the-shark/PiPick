@@ -34,6 +34,11 @@ class HomePage extends StatelessWidget {
             label: "Wszystkie Logi",
             route: LogsListRoute(),
           ),
+          const NavCard(
+            icon: Icons.admin_panel_settings,
+            label: "Dodaj Admina",
+            route: CreateAdminRoute(),
+          ),
         ],
       ),
     );
