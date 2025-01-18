@@ -1,13 +1,13 @@
-name: windows manual build
+name: windows msix
+
 on:
   push:
-    branches: ["windows_deploy"]
+    branches: ["**"]
 
 
 defaults:
   run:
     working-directory: ./admin-panel
-
 
 jobs:
   build:
@@ -28,17 +28,21 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       
-      # - name: Example .env
-      #   run: cp example.env .env
-
       - name: generate files
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: build windows
-        run: flutter build windows --release
+      - name: build msix package
+        run: dart run msix:create
 
       - uses: actions/upload-artifact@v4
         with:
-          name: build_output
+          name: exe_output
           path: |
             admin-panel\build\windows\x64\runner\Release\
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msix_output
+          path: |
+            admin-panel\build\windows\x64\runner\Release\pipick.msix
+  
