@@ -69,16 +69,13 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
   const topic = "pipick/logs";
   client.subscribe(topic, MqttQos.atMostOnce);
   final streamController = StreamController<AccessMessage>();
-  ref.onDispose(() {
-    client.disconnect();
-    streamController.close();
-  });
-  client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) async {
-    final recMessage = c[0].payload as MqttPublishMessage;
+
+  final listenerSubscription = client.updates!.listen((updates) async {
+    final recMessage = updates[0].payload as MqttPublishMessage;
     final payload =
         MqttPublishPayload.bytesToStringAsString(recMessage.payload.message);
 
-    debugPrint("Received message: $payload from topic: ${c[0].topic}");
+    debugPrint("Received message: $payload from topic: ${updates[0].topic}");
 
     try {
       final Map<String, dynamic> jsonData = jsonDecode(payload);
@@ -90,7 +87,6 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
         final String date = jsonData["date"];
         final DateTime dateTime = DateTime.parse(date);
         final int zoneId = jsonData["zoneId"];
-
         final String rfidCard = jsonData["rfidCard"].toString();
 
         final isar = await ref.read(isarProvider.future);
@@ -105,13 +101,22 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
           await isar.logs.put(logEntry);
           await logEntry.zone.save();
         });
+
         ref.invalidate(allLogsRepositoryProvider);
         ref.invalidate(logsByZoneRepositoryProvider);
+
         streamController.sink.add((rfidCard: rfidCard, zoneId: zoneId));
       }
     } on Exception catch (e) {
       debugPrint("Error parsing JSON: $e");
     }
   });
+
+  ref.onDispose(() {
+    listenerSubscription.cancel();
+    client.disconnect();
+    streamController.close();
+  });
+
   return streamController.stream.asBroadcastStream();
 }
