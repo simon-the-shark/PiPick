@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:convert";
 
 import "package:flutter/foundation.dart";
@@ -24,8 +25,13 @@ class MqttHost extends _$MqttHost {
   }
 }
 
+typedef AccessMessage = ({
+  String rfidCard,
+  int zoneId,
+});
+
 @Riverpod(keepAlive: true)
-Future<MqttServerClient> mqttClient(Ref ref) async {
+Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
   final host = ref.watch(mqttHostProvider);
   if (host == null) {
     throw Exception("MQTT host is not set");
@@ -62,7 +68,11 @@ Future<MqttServerClient> mqttClient(Ref ref) async {
 
   const topic = "pipick/logs";
   client.subscribe(topic, MqttQos.atMostOnce);
-
+  final streamController = StreamController<AccessMessage>();
+  ref.onDispose(() {
+    client.disconnect();
+    streamController.close();
+  });
   client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) async {
     final recMessage = c[0].payload as MqttPublishMessage;
     final payload =
@@ -97,10 +107,11 @@ Future<MqttServerClient> mqttClient(Ref ref) async {
         });
         ref.invalidate(allLogsRepositoryProvider);
         ref.invalidate(logsByZoneRepositoryProvider);
+        streamController.sink.add((rfidCard: rfidCard, zoneId: zoneId));
       }
     } on Exception catch (e) {
       debugPrint("Error parsing JSON: $e");
     }
   });
-  return client;
+  return streamController.stream.asBroadcastStream();
 }

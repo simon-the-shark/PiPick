@@ -4,10 +4,14 @@ import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:isar/isar.dart";
+import "package:mqtt_client/mqtt_client.dart";
 import "package:reactive_forms_annotations/reactive_forms_annotations.dart";
 
 import "../../../database/models.dart";
+import "../../../database/provider.dart";
+import "../../../mqtt_client.dart";
 import "../../../utils/unique_db_form_validator.dart";
+import "../../access_zones/data/acces_zones_repository.dart";
 import "../data/users_repository.dart";
 import "rfid_field.dart";
 
@@ -134,9 +138,14 @@ class UserFormDialog extends ConsumerWidget {
                   ),
                   keyboardType: TextInputType.phone,
                 ),
-                RfidField(
-                  rfidCardControl: formModel.rfidCardControl,
-                ),
+                ref.watch(accessZonesRepositoryProvider).when(
+                      loading: () => const CircularProgressIndicator(),
+                      error: (error, _) => Text("Error: $error"),
+                      data: (zones) => RfidField(
+                        rfidCardControl: formModel.rfidCardControl,
+                        zones: zones,
+                      ),
+                    ),
               ],
             ),
           ),
