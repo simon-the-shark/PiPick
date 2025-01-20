@@ -8,6 +8,7 @@ import "package:riverpod_annotation/riverpod_annotation.dart";
 
 import "database/models.dart";
 import "database/provider.dart";
+import "features/logs/data/logs_repository.dart";
 
 part "mqtt_client.g.dart";
 
@@ -94,6 +95,8 @@ Future<MqttServerClient> mqttClient(Ref ref) async {
           await isar.logs.put(logEntry);
           await logEntry.zone.save();
         });
+        ref.invalidate(allLogsRepositoryProvider);
+        ref.invalidate(logsByZoneRepositoryProvider);
       }
     } on Exception catch (e) {
       debugPrint("Error parsing JSON: $e");
