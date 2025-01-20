@@ -55,28 +55,23 @@ Future<void> showLoadingDialog(
   FormControl<String>? rfidCardControl,
 ) {
   StreamSubscription<AccessMessage>? stream;
-
   stream = ref.watch(mqttClientProvider).value?.listen((event) async {
-    print(event);
     if (event.zoneId == zoneId) {
       await stream?.cancel();
-      Navigator.of(context).pop();
-
       rfidCardControl?.value = event.rfidCard;
-
+      if (context.mounted) Navigator.of(context).pop();
       toastification.show(
-        context: context,
         title: const Text("Karta zeskanowana"),
         description: const Text("Użytkownik ma dostęp do strefy"),
         type: ToastificationType.success,
-        autoCloseDuration: const Duration(seconds: 2),
+        autoCloseDuration: const Duration(seconds: 5),
       );
     }
   });
 
   return showDialog(
     context: context,
-    barrierDismissible: false, // Prevent dismissing by tapping outside
+    barrierDismissible: false,
     builder: (BuildContext context) {
       return AlertDialog(
         content: const SizedBox(
@@ -93,10 +88,7 @@ Future<void> showLoadingDialog(
         actions: [
           TextButton(
             onPressed: () async {
-              // Cancel the MQTT listener
               await stream?.cancel();
-
-              // ref.read(singleLogProvider.notifier).cancel();
               if (context.mounted) {
                 Navigator.of(context).pop();
               }
@@ -113,7 +105,7 @@ class RfidField extends ConsumerWidget {
   const RfidField({
     super.key,
     required this.rfidCardControl,
-    required this.zones, // Add this parameter
+    required this.zones,
   });
 
   final FormControl<String>? rfidCardControl;
@@ -125,7 +117,6 @@ class RfidField extends ConsumerWidget {
       readOnly: true,
       onTap: (_) {
         toastification.show(
-          context: context,
           title: const Text("Kartę RFID można tylko zeskanować"),
           type: ToastificationType.warning,
           autoCloseDuration: const Duration(seconds: 2),
@@ -149,8 +140,7 @@ class RfidField extends ConsumerWidget {
                 onPressed: () async {
                   final selectedZone =
                       await showZoneSelectionDialog(context, zones);
-                  print(selectedZone);
-                  if (selectedZone != null) {
+                  if (selectedZone != null && context.mounted) {
                     await showLoadingDialog(
                       context,
                       ref,
