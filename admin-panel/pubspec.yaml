@@ -75,6 +75,16 @@ dev_dependencies:
   reactive_forms_generator: ^5.1.2
   freezed: ^2.5.2
   auto_route_generator: ^9.0.0
+  msix: ^3.16.8
+
+msix_config:
+  display_name: PiPick
+  publisher_display_name: Szymon Kowaliński
+  identity_name: SzymonKowaliski.PiPick
+  publisher: CN=F6C0F3AF-2E85-4E6B-A922-DADF18857C42
+  msix_version: 1.0.0.0
+  store: true
+  logo_path: ./assets/logo.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

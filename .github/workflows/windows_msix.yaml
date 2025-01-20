@@ -1,0 +1,48 @@
+name: windows msix
+
+on:
+  push:
+    branches: ["**"]
+
+
+defaults:
+  run:
+    working-directory: ./admin-panel
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Choco install
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+            args: install yq
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: any
+          flutter-version-file: admin-panel/pubspec.yaml
+
+      - run: flutter --version
+    
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: generate files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: build msix package
+        run: dart run msix:create
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exe_output
+          path: |
+            admin-panel\build\windows\x64\runner\Release\
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msix_output
+          path: |
+            admin-panel\build\windows\x64\runner\Release\pipick.msix
+  
