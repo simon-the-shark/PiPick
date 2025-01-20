@@ -4,6 +4,7 @@ import "package:toastification/toastification.dart";
 
 import "router.dart";
 import "theme.dart";
+import "mqtt_client.dart";
 
 Future<void> main() async {
   runApp(
@@ -13,11 +14,22 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    setupMqtt(ref);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: MaterialApp.router(
         title: "PiPick",

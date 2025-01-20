@@ -53,6 +53,7 @@ dependencies:
   toastification: ^2.3.0
   collection: ^1.19.0
   fast_immutable_collections: ^11.0.3
+  mqtt_client: ^10.5.1
 
 dev_dependencies:
   flutter_test:
