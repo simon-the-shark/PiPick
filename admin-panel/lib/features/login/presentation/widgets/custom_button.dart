@@ -17,7 +17,6 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        
         unawaited(context.router.replaceAll(route));
       },
       style: ButtonStyle(
