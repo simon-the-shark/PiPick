@@ -1,39 +1,63 @@
 import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
+import "../../../mqtt_client.dart";
 import "../../../router.gr.dart";
 import "widgets/custom_button.dart";
 
 @RoutePage()
-class LoginPage extends StatelessWidget {
+class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ipState = useState("");
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Strona logowania"),
       ),
-      body: const Center(
+      body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                TextField(
+                const TextField(
                   decoration: InputDecoration(
                     labelText: "Nazwa użytkownika",
                   ),
                 ),
-                SizedBox(height: 16),
-                TextField(
+                const SizedBox(height: 16),
+                const TextField(
                   decoration: InputDecoration(
                     labelText: "Hasło",
                   ),
                   obscureText: true,
                 ),
-                SizedBox(height: 32),
-                CustomButton(
-                  text: "Zaloguj",
-                  route: [HomeRoute()],
+                const SizedBox(height: 16),
+                TextField(
+                  onChanged: (value) => ipState.value = value,
+                  decoration: const InputDecoration(
+                    labelText: "Adres IP brokera MQTT",
+                  ),
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () async {
+                    ref.read(mqttHostProvider.notifier).setIp(ipState.value);
+                    await context.router.replaceAll([const HomeRoute()]);
+                  },
+                  style: ButtonStyle(
+                    padding: WidgetStateProperty.all(
+                      const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                    ),
+                  ),
+                  child: const Text("Zaloguj się"),
                 ),
               ],
             ),
