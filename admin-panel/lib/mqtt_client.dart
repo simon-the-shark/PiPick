@@ -12,8 +12,24 @@ import "database/provider.dart";
 part "mqtt_client.g.dart";
 
 @Riverpod(keepAlive: true)
+class MqttHost extends _$MqttHost {
+  @override
+  String? build() {
+    return null;
+  }
+
+  void setIp(String ip) {
+    state = ip;
+  }
+}
+
+@Riverpod(keepAlive: true)
 Future<MqttServerClient> mqttClient(Ref ref) async {
-  final client = MqttServerClient("localhost", "flutter_client");
+  final host = ref.watch(mqttHostProvider);
+  if (host == null) {
+    throw Exception("MQTT host is not set");
+  }
+  final client = MqttServerClient(host, "flutter_client");
   client.port = 1883;
   client.logging(on: kDebugMode);
   client.keepAlivePeriod = 20;

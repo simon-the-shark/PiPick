@@ -19,8 +19,6 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(mqttClientProvider);
-
     return ToastificationWrapper(
       child: MaterialApp.router(
         title: "PiPick",

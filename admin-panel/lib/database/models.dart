@@ -68,6 +68,9 @@ class Logs {
   @Index()
   late DateTime timestamp;
 
+  String? message;
+
   late bool successful;
+
   String? rfidCard;
 }

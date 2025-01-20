@@ -2,16 +2,20 @@ import "dart:async";
 
 import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
 
+import "../../mqtt_client.dart";
 import "../../router.gr.dart";
 import "nav_card.dart";
 
 @RoutePage()
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(mqttClientProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("PiPick"),
