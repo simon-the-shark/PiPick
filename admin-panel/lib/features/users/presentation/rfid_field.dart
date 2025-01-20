@@ -14,7 +14,7 @@ class RfidField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mqtt = ref.watch(mqttClientProvider);
+    final _ = ref.watch(mqttClientProvider);
 
     return ReactiveTextField<String>(
       readOnly: true,
