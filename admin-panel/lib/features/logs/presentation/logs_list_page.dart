@@ -1,5 +1,6 @@
 // logs_list_page.dart
 import "package:auto_route/auto_route.dart";
+import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -27,7 +28,7 @@ class LogsListPage extends HookConsumerWidget {
           : allLogsRepositoryProvider,
     );
 
-    final isAscending = useState<bool>(true);
+    final isAscending = useState<bool>(false);
     final showFailed = useState<bool>(false);
 
     return Scaffold(
@@ -54,17 +55,31 @@ class LogsListPage extends HookConsumerWidget {
           if (logs.isEmpty) {
             return const Center(child: Text("Brak logów"));
           }
-          return ListView.builder(
-            itemCount: logs.length,
-            itemBuilder: (context, index) {
-              final log = logs[index];
-              return ListTile(
-                title: Text("Log ID: ${log.id} - ${log.timestamp}"),
-                subtitle: Text(
-                  'Użytkownik: ${log.user.value?.name ?? "brak"}\n'
-                  'Strefa: ${log.zone.value?.number ?? "brak"}\n'
-                  "Udane wejście: ${log.successful ? "Yes" : "No"}",
-                ),
+          return HookConsumer(
+            builder: (context, ref, child) {
+              final sortedLogs = useMemoized<IList<Logs>>(
+                () {
+                  if (allLogs.valueOrNull == null) return const IList.empty();
+                  return allLogs.valueOrNull!.sort((a, b) {
+                    final comparison = a.timestamp.compareTo(b.timestamp);
+                    return isAscending.value ? comparison : -comparison;
+                  });
+                },
+                [allLogs.value, isAscending.value],
+              );
+              return ListView.builder(
+                itemCount: sortedLogs.length,
+                itemBuilder: (context, index) {
+                  final log = sortedLogs[index];
+                  return ListTile(
+                    title: Text("Log ID: ${log.id} - ${log.timestamp}"),
+                    subtitle: Text(
+                      'Użytkownik: ${log.user.value?.name ?? "brak"}\n'
+                      'Strefa: ${log.zone.value?.number ?? "brak"}\n'
+                      "Udane wejście: ${log.successful ? "Yes" : "No"}",
+                    ),
+                  );
+                },
               );
             },
           );
