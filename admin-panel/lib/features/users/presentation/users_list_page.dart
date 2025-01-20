@@ -15,7 +15,7 @@ class UsersListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Zarządaj użytkownikami")),
+      appBar: AppBar(title: const Text("Zarządzaj użytkownikami")),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await showDialog(
