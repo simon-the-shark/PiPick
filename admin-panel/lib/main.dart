@@ -2,9 +2,9 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:toastification/toastification.dart";
 
+import "mqtt_client.dart";
 import "router.dart";
 import "theme.dart";
-import "mqtt_client.dart";
 
 Future<void> main() async {
   runApp(
@@ -14,22 +14,13 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends ConsumerStatefulWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(mqttClientProvider);
 
-class _MyAppState extends ConsumerState<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    setupMqtt(ref);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return ToastificationWrapper(
       child: MaterialApp.router(
         title: "PiPick",

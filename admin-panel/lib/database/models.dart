@@ -48,7 +48,6 @@ class AccessZone {
   @Index(unique: true)
   late int number;
 
-  @Index(unique: true)
   late String location;
 
   @Backlink(to: "allowedZones")
