@@ -30,7 +30,7 @@ jobs:
           clientId: ${{ secrets.clientId }}
           clientSecret: ${{ secrets.clientSecret }}
           sellerId: ${{ secrets.sellerId }}
-        run: msstore reconfigure --tenantId $tenantId --clientId $clientId --clientSecret $clientSecret--sellerId $sellerId
+        run: msstore reconfigure --tenantId $tenantId --clientId $clientId --clientSecret $clientSecret --sellerId $sellerId
     
       - name: Install dependencies
         run: flutter pub get
