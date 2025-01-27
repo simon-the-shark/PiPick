@@ -109,17 +109,14 @@ async def access_denied(message_decoded):
     print(f"Access denied for card {message_decoded['rfidCard']} at {message_decoded['date']}")
     pixels.fill((255, 0, 0))
     pixels.show()
-    buzzer(True)
-    await asyncio.sleep(0.2)
-    buzzer(False)
-    await asyncio.sleep(0.2)
-    buzzer(True)
-    await asyncio.sleep(0.2)
-    buzzer(False)
-    await asyncio.sleep(0.2)
-    buzzer(True)
-    await asyncio.sleep(0.2)
-    buzzer(False)
+
+    for i in range(0,4):
+        even = i % 2 == 0
+        buzzer(even)
+        await asyncio.sleep(0.2)
+        pixels.fill((255, 0, 0) if even else (0,0,0))
+        pixels.show()
+
         
 async def test():
     connect_to_broker()
