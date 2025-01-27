@@ -81,7 +81,19 @@ Future<void> main() async {
 
     log3.user.value = user;
     log3.zone.value = strefa;
+    for (int i = 0; i < 10; i++) {
+      final log = Logs()
+        ..timestamp = DateTime.now().add(Duration(days: i))
+        ..successful = 2 % i == 0
+        ..rfidCard = "RFID${123 + i}";
 
+      log.user.value = user;
+      log.zone.value = strefa;
+
+      await isar.logs.put(log);
+      await log.user.save();
+      await log.zone.save();
+    }
     await isar.logs.put(log3);
     await log3.user.save();
     await log3.zone.save();

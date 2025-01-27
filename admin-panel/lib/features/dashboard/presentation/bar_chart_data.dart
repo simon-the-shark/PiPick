@@ -2,17 +2,18 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:fl_chart/fl_chart.dart";
 import "package:flutter/material.dart";
 
+import "bar_combined_chart.dart";
+
 BarChartData buildBarChartData(
-  IMap<String, int> frequency,
-  Color lineColor,
-  String tooltipSuffix,
+  CombinedFreqs frequencies,
 ) {
   return BarChartData(
     barTouchData: BarTouchData(
       touchTooltipData: BarTouchTooltipData(
         getTooltipItem: (group, groupIndex, rod, rodIndex) {
-          final date = frequency.keys.elementAt(group.x);
+          final date = frequencies.keys.elementAt(group.x);
           final value = rod.toY.toInt();
+          final tooltipSuffix = rodIndex == 0 ? "Nieudanych Wejść" : "Wejść";
           return BarTooltipItem(
             "$date\n$value $tooltipSuffix",
             const TextStyle(
@@ -40,8 +41,8 @@ BarChartData buildBarChartData(
           interval: 1,
           getTitlesWidget: (double value, TitleMeta meta) {
             final int index = value.toInt();
-            if (index >= 0 && index < frequency.keys.length) {
-              final text = frequency.keys.elementAt(index);
+            if (index >= 0 && index < frequencies.keys.length) {
+              final text = frequencies.keys.elementAt(index);
               return SideTitleWidget(
                 meta: meta,
                 child: Transform.rotate(
@@ -80,21 +81,35 @@ BarChartData buildBarChartData(
       ),
     ),
     barGroups: [
-      ...frequency.entries.map(
+      ...frequencies.entries.map(
         (e) => BarChartGroupData(
-          x: frequency.keys.toIList().indexOf(e.key),
+          x: frequencies.keys.toIList().indexOf(e.key),
           barRods: [
-            BarChartRodData(
-              toY: e.value.toDouble(),
-              color: lineColor,
-            ),
+            if (e.value.failed != null)
+              BarChartRodData(
+                toY: e.value.failed!.toDouble(),
+                color: Colors.redAccent,
+              ),
+            if (e.value.success != null)
+              BarChartRodData(
+                toY: e.value.success!.toDouble(),
+                color: Colors.blue,
+              ),
           ],
         ),
       ),
     ],
     minY: 0,
-    maxY: frequency.values.isNotEmpty
-        ? (frequency.values.reduce((a, b) => a > b ? a : b).toDouble()) + 1
+    maxY: frequencies.values.isNotEmpty
+        ? (frequencies.values
+                .map(
+                  (e) => (e.failed ?? 0) > (e.success ?? 0)
+                      ? (e.failed ?? 0)
+                      : (e.success ?? 0),
+                )
+                .reduce((a, b) => a > b ? a : b)
+                .toDouble()) +
+            1
         : 10,
   );
 }

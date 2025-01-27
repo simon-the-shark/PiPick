@@ -5,7 +5,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../../../database/models.dart";
 import "../data/frequencies_repositories.dart";
-import "freq_chart.dart";
+import "bar_combined_chart.dart";
 
 @RoutePage()
 class DashboardPage extends HookConsumerWidget {
@@ -60,26 +60,11 @@ class _DasboardPageContent extends StatelessWidget {
       return const Center(child: Text("No Logs Available"));
     }
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          spacing: 30,
-          children: [
-            FrequenciesChart(
-              header: "Częstotliwość Wejść - ${accessZone.location}",
-              freqMap: entriesFrequency,
-              label: "Wejść",
-              color: Colors.blue,
-            ),
-            FrequenciesChart(
-              header: "Nieudane Wejścia - ${accessZone.location}",
-              freqMap: failedEntriesFrequency,
-              label: "Nieudanych Wejść",
-              color: Colors.redAccent,
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(84),
+      child: BarCombinedChart(
+        entriesFrequency: entriesFrequency,
+        failedEntriesFrequency: failedEntriesFrequency,
       ),
     );
   }
