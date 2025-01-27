@@ -6,7 +6,7 @@ import sys
 import time
 import asyncio
 import RPi.GPIO as GPIO
-from raspberry.config import *  # pylint: disable=unused-wildcard-import
+from config import *  # pylint: disable=unused-wildcard-import
 from mfrc522 import MFRC522
 import board
 import neopixel
