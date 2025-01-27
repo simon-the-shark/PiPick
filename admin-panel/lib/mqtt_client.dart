@@ -3,6 +3,7 @@ import "dart:convert";
 
 import "package:flutter/foundation.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:isar/isar.dart";
 import "package:mqtt_client/mqtt_client.dart";
 import "package:mqtt_client/mqtt_server_client.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
@@ -91,11 +92,35 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
 
         final isar = await ref.read(isarProvider.future);
         final zone = await isar.accessZones.get(zoneId);
+
+        final user =
+            await isar.users.where().rfidCardEqualTo(rfidCard).findFirst();
+
+        var accessGranted = false;
+
+        if (user != null && zone != null && user.allowedZones.contains(zone)) {
+          accessGranted = true;
+        }
+
         final logEntry = Logs()
           ..timestamp = dateTime
-          ..successful = true
+          ..successful = accessGranted
           ..rfidCard = rfidCard;
         logEntry.zone.value = zone;
+
+        final payload = jsonEncode({
+          "rfidCard": rfidCard,
+          "zoneId": zoneId,
+          "accessGranted": accessGranted,
+          "date": dateTime.toIso8601String(),
+        });
+        final builder = MqttClientPayloadBuilder();
+        builder.addString(payload);
+        client.publishMessage(
+          "pipick/access",
+          MqttQos.exactlyOnce,
+          builder.payload!,
+        );
 
         await isar.writeTxn(() async {
           await isar.logs.put(logEntry);
