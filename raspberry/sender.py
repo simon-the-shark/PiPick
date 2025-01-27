@@ -121,7 +121,7 @@ async def process_message(client, userdata, message):
 def test():
     connect_to_broker()
 
-    client. = process_message
+    client.on_message = process_message
 
     client.subscribe("pipick/access")
     print('\nThe RFID reader test.')
