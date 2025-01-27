@@ -135,7 +135,7 @@ async def test():
 
 if __name__ == "__main__":
     try:
-        result = test()
+        asyncio.run(test())
     except KeyboardInterrupt:
         GPIO.cleanup()  # pylint: disable=no-member
         client.loop_stop()
