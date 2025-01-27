@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import paho.mqtt.client as mqtt
+# import tkinter
+# import sqlite3
 import time
 
 
@@ -12,7 +14,7 @@ broker = "localhost"
 # The MQTT client.
 client = mqtt.Client()
 
-if len(message_decoded) >= 2 and message_decoded[0] != "Client connected" and message_decoded[0] != "Client disconnected":
+def process_message(client, userdata, message):
     # Decode message.
     message_decoded = (str(message.payload.decode("utf-8"))).split(".")
 
@@ -30,7 +32,7 @@ if len(message_decoded) >= 2 and message_decoded[0] != "Client connected" and me
 def connect_to_broker():
     # Connect to the broker.
     client.connect(broker)
-    # Send message about connection.
+    # Send message about conenction.
     client.on_message = process_message
     # Starts client and subscribe.
     client.loop_start()
@@ -38,7 +40,7 @@ def connect_to_broker():
 
 
 def disconnect_from_broker():
-    # Disconnect the client.
+    # Disconnet the client.
     client.loop_stop()
     client.disconnect()
 
