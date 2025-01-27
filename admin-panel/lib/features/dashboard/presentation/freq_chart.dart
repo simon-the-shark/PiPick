@@ -2,7 +2,7 @@ import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:fl_chart/fl_chart.dart";
 import "package:flutter/material.dart";
 
-import "chart_data.dart";
+import "bar_chart_data.dart";
 
 class FrequenciesChart extends StatelessWidget {
   const FrequenciesChart({
@@ -33,8 +33,8 @@ class FrequenciesChart extends StatelessWidget {
           height: 300,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: LineChart(
-              buildLineChartData(
+            child: BarChart(
+              buildBarChartData(
                 freqMap,
                 color,
                 label,
