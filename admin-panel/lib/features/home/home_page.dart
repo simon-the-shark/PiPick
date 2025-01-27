@@ -1,14 +1,11 @@
-import "dart:async";
-
-import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 
 import "../../mqtt_client.dart";
 import "../../router.gr.dart";
+import "../login/business/auth_service.dart";
 import "nav_card.dart";
 
-@RoutePage()
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
@@ -49,7 +46,7 @@ class HomePage extends ConsumerWidget {
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () async {
-                unawaited(context.router.replaceAll([const LoginRoute()]));
+                ref.read(authServiceProvider.notifier).logout();
               },
               child: Center(
                 child: Column(

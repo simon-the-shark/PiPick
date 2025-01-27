@@ -1,11 +1,8 @@
-import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:toastification/toastification.dart";
 
-import "../../../mqtt_client.dart";
-import "../../../router.gr.dart";
-import "../../create_admin/data/admin_repository.dart";
+import "../business/auth_service.dart";
 import "login_page.dart";
 
 class LoginButton extends ConsumerWidget {
@@ -15,20 +12,14 @@ class LoginButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ElevatedButton(
       onPressed: () async {
-        final repo = ref.read(adminRepositoryProvider.notifier);
+        final service = ref.read(authServiceProvider.notifier);
         if (formModel.form.valid &&
             formModel.ipNumberControl.value != null &&
-            await repo.validateAuth(
+            await service.login(
               formModel.loginControl.value!,
               formModel.passwordControl.value!,
+              formModel.ipNumberControl.value!,
             )) {
-          ref.read(adminRepositoryProvider.notifier);
-          ref.read(mqttHostProvider.notifier).setIp(
-                formModel.ipNumberControl.value!,
-              );
-          if (context.mounted) {
-            await context.router.replaceAll([const HomeRoute()]);
-          }
         } else {
           toastification.show(
             title: const Text(

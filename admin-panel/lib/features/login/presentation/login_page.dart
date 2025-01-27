@@ -1,4 +1,3 @@
-import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:freezed_annotation/freezed_annotation.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
@@ -19,7 +18,6 @@ class LoginForm with _$LoginForm {
   }) = _LoginForm;
 }
 
-@RoutePage()
 class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
 

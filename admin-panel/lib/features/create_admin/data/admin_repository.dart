@@ -37,12 +37,12 @@ class AdminRepository extends _$AdminRepository {
     return (await isar.admins.where().loginEqualTo(login).findAll()).isEmpty;
   }
 
-  Future<bool> validateAuth(String login, String password) async {
+  Future<Admin?> validateAuth(String login, String password) async {
     final isar = await ref.watch(isarProvider.future);
     final admin = await isar.admins.where().loginEqualTo(login).findFirst();
     if (admin != null && BCrypt.checkpw(password, admin.password)) {
-      return true;
+      return admin;
     }
-    return false;
+    return null;
   }
 }
