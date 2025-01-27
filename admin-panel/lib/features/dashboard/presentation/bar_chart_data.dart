@@ -61,7 +61,17 @@ BarChartData buildBarChartData(
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          interval: 1,
+          interval: (frequencies.values.isNotEmpty
+              ? (frequencies.values
+                      .map(
+                        (e) => (e.failed ?? 0) > (e.success ?? 0)
+                            ? (e.failed ?? 0)
+                            : (e.success ?? 0),
+                      )
+                      .reduce((a, b) => a > b ? a : b)
+                      .toDouble()) /
+                  4
+              : 2.0),
           reservedSize: 40,
           getTitlesWidget: (value, meta) {
             return Text(
