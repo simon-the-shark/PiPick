@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import "package:bcrypt/bcrypt.dart";
 import "package:flutter/material.dart";
 import "package:isar/isar.dart";
 import "package:path_provider/path_provider.dart";
@@ -16,10 +17,9 @@ Future<void> main() async {
   );
 
   await isar.writeTxn(() async {
-    // Tworzenie Admina
     final admin = Admin()
       ..login = "admin123"
-      ..password = "securepassword"
+      ..password = BCrypt.hashpw("admin123", BCrypt.gensalt())
       ..name = "Jan"
       ..surname = "Kowalski"
       ..email = "jan.kowalski@example.com";

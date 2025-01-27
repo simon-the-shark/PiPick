@@ -1,3 +1,4 @@
+import "package:bcrypt/bcrypt.dart";
 import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:isar/isar.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
@@ -16,6 +17,9 @@ class AdminRepository extends _$AdminRepository {
   }
 
   Future<void> putAdmin(Admin admin) async {
+    final password = admin.password;
+    final hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+    admin.password = hashedPassword;
     final isar = await ref.watch(isarProvider.future);
     await isar.writeTxn(() async {
       await isar.admins.put(admin);
@@ -31,5 +35,14 @@ class AdminRepository extends _$AdminRepository {
   Future<bool> isLoginUnique(String login) async {
     final isar = await ref.watch(isarProvider.future);
     return (await isar.admins.where().loginEqualTo(login).findAll()).isEmpty;
+  }
+
+  Future<bool> validateAuth(String login, String password) async {
+    final isar = await ref.watch(isarProvider.future);
+    final admin = await isar.admins.where().loginEqualTo(login).findFirst();
+    if (admin != null && BCrypt.checkpw(password, admin.password)) {
+      return true;
+    }
+    return false;
   }
 }
