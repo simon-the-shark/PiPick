@@ -21,6 +21,7 @@ class LoginButton extends ConsumerWidget {
               formModel.ipNumberControl.value!,
             )) {
         } else {
+          formModel.form.markAllAsTouched();
           toastification.show(
             title: const Text(
               "Niepoprawne dane logowania.",

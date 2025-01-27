@@ -69,6 +69,12 @@ ThemeData getTheme() {
             WidgetState.any: Colors.purple,
           },
         ),
+        iconColor: WidgetStateProperty.fromMap(
+          {
+            WidgetState.disabled: Colors.grey.shade500,
+            WidgetState.any: Colors.purple,
+          },
+        ),
         padding: WidgetStateProperty.all<EdgeInsets>(
           const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),

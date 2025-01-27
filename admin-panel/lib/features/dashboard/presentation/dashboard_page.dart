@@ -6,6 +6,7 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 import "../../../database/models.dart";
 import "../data/frequencies_repositories.dart";
 import "bar_combined_chart.dart";
+import "seeder_btn.dart";
 
 @RoutePage()
 class DashboardPage extends HookConsumerWidget {
@@ -23,6 +24,12 @@ class DashboardPage extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dashboard"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 32),
+            child: SeederBtn(accessZone),
+          ),
+        ],
       ),
       body: switch ((entriesFrequency, failedEntriesFrequency)) {
         (
