@@ -4,6 +4,7 @@
 
 import sys
 import time
+import asyncio
 import RPi.GPIO as GPIO
 from raspberry.config import *  # pylint: disable=unused-wildcard-import
 from mfrc522 import MFRC522
@@ -12,8 +13,9 @@ import neopixel
 import datetime
 import paho.mqtt.client as mqtt
 import json
-# The terminal ID - can be any string.
-terminal_id = "T0"
+
+raspberry_config = json.load(open("config.json"))
+
 # The broker name or IP address.
 broker = "localhost"
 # broker = "127.0.0.1"
@@ -23,8 +25,7 @@ broker = "localhost"
 client = mqtt.Client()
 
 def call_worker(payload):
-    payload["client_name"] = "drzwi_01"
-    client.publish("worker/name", json.dumps(payload))
+    client.publish("pipick/logs", json.dumps(payload))
 
 
 def connect_to_broker():
@@ -52,7 +53,7 @@ MIFAREReader = MFRC522()
 
 registered_dates = []
 
-def rfidRead():
+async def rfidRead():
     read_success = False
     while not read_success:
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
@@ -64,14 +65,8 @@ def rfidRead():
                     num += uid[i] << (i*8)
                 now_date = datetime.datetime.now()
                 print(f"Card read UID: {uid} > {num} - {now_date.isoformat()}")
-                pixels.fill((255, 0, 0))
-                pixels.show()
-                call_worker({"num": num, "zoneId": 1, "rfidCard": str(uid), "date": now_date.isoformat()})
-                
-                buzzer(True)
-                time.sleep(0.5)
-                buzzer(False)
-
+              
+                call_worker({"num": num, "zoneId": raspberry_config["zoneId"], "rfidCard": str(uid), "date": now_date.isoformat()})
                 
                
                 read_success = True
@@ -84,14 +79,51 @@ def rfidRead():
             go_away = False
         else:
             print("HOLDING!!!")
-            time.sleep(0.2)
+            await asyncio.sleep(0.5)
             
         
     pixels.fill((0,0,0))
     pixels.show()
 
+async def process_message(client, userdata, message):
+    # Decode message.
+    message_decoded = json.loads(message.payload.decode("utf-8"))
+    
+    if message_decoded["zoneId"] == raspberry_config["zoneId"]:
+        if message_decoded["accessGranted"]:
+                
+            pixels.fill((0, 255, 0))
+            pixels.show()
+
+            buzzer(True)
+            print(f"Access granted for card {message_decoded['rfidCard']} at {message_decoded['date']}")
+            await asyncio.sleep(1)
+            buzzer(False)
+        else:
+            print(f"Access denied for card {message_decoded['rfidCard']} at {message_decoded['date']}")
+            pixels.fill((255, 0, 0))
+            pixels.show()
+            buzzer(True)
+            await asyncio.sleep(0.2)
+            buzzer(False)
+            await asyncio.sleep(0.2)
+            buzzer(True)
+            await asyncio.sleep(0.2)
+            buzzer(False)
+            await asyncio.sleep(0.2)
+            buzzer(True)
+            await asyncio.sleep(0.2)
+            buzzer(False)
+        
+        
+
+
 def test():
     connect_to_broker()
+
+    client. = process_message
+
+    client.subscribe("pipick/access")
     print('\nThe RFID reader test.')
     print('Place the card close to the reader (on the right side of the set).')
     client.loop_start()
