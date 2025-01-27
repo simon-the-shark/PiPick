@@ -96,11 +96,8 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
         final user =
             await isar.users.where().rfidCardEqualTo(rfidCard).findFirst();
 
-        var accessGranted = false;
-
-        if (user != null && zone != null && user.allowedZones.contains(zone)) {
-          accessGranted = true;
-        }
+        final accessGranted =
+            user != null && zone != null && user.allowedZones.contains(zone);
 
         final logEntry = Logs()
           ..timestamp = dateTime
