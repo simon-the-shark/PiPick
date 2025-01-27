@@ -85,39 +85,42 @@ async def rfidRead():
     pixels.fill((0,0,0))
     pixels.show()
 
-async def process_message(client, userdata, message):
+def process_message(client, userdata, message):
     # Decode message.
     message_decoded = json.loads(message.payload.decode("utf-8"))
     
     if message_decoded["zoneId"] == raspberry_config["zoneId"]:
         if message_decoded["accessGranted"]:
-                
-            pixels.fill((0, 255, 0))
-            pixels.show()
-
-            buzzer(True)
-            print(f"Access granted for card {message_decoded['rfidCard']} at {message_decoded['date']}")
-            await asyncio.sleep(1)
-            buzzer(False)
+            asyncio.run(access_granted(message_decoded))
+        
         else:
-            print(f"Access denied for card {message_decoded['rfidCard']} at {message_decoded['date']}")
-            pixels.fill((255, 0, 0))
-            pixels.show()
-            buzzer(True)
-            await asyncio.sleep(0.2)
-            buzzer(False)
-            await asyncio.sleep(0.2)
-            buzzer(True)
-            await asyncio.sleep(0.2)
-            buzzer(False)
-            await asyncio.sleep(0.2)
-            buzzer(True)
-            await asyncio.sleep(0.2)
-            buzzer(False)
-        
-        
+            asyncio.run(access_denied(message_decoded))
+async def access_granted(message_decoded):
+    pixels.fill((0, 255, 0))
+    pixels.show()
 
+    
+    buzzer(True)
+    print(f"Access granted for card {message_decoded['rfidCard']} at {message_decoded['date']}")
+    await asyncio.sleep(1)
+    buzzer(False)
 
+async def access_denied(message_decoded):
+    print(f"Access denied for card {message_decoded['rfidCard']} at {message_decoded['date']}")
+    pixels.fill((255, 0, 0))
+    pixels.show()
+    buzzer(True)
+    await asyncio.sleep(0.2)
+    buzzer(False)
+    await asyncio.sleep(0.2)
+    buzzer(True)
+    await asyncio.sleep(0.2)
+    buzzer(False)
+    await asyncio.sleep(0.2)
+    buzzer(True)
+    await asyncio.sleep(0.2)
+    buzzer(False)
+        
 async def test():
     connect_to_broker()
 
