@@ -118,7 +118,7 @@ async def process_message(client, userdata, message):
         
 
 
-def test():
+async def test():
     connect_to_broker()
 
     client.on_message = process_message
@@ -128,14 +128,14 @@ def test():
     print('Place the card close to the reader (on the right side of the set).')
     client.loop_start()
     while True:
-        rfidRead()
+        await rfidRead()
         
 
 
 
 if __name__ == "__main__":
     try:
-        test()
+        result = test()
     except KeyboardInterrupt:
         GPIO.cleanup()  # pylint: disable=no-member
         client.loop_stop()
