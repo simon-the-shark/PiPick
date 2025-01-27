@@ -60,7 +60,13 @@ class LogsListPage extends HookConsumerWidget {
               final sortedLogs = useMemoized<IList<Logs>>(
                 () {
                   if (allLogs.valueOrNull == null) return const IList.empty();
-                  return allLogs.valueOrNull!.sort((a, b) {
+                  final filteredLogs = allLogs.valueOrNull!
+                      .where(
+                        // ignore: avoid_bool_literals_in_conditional_expressions
+                        (log) => showFailed.value ? !log.successful : true,
+                      )
+                      .toIList();
+                  return filteredLogs.sort((a, b) {
                     final comparison = a.timestamp.compareTo(b.timestamp);
                     return isAscending.value ? comparison : -comparison;
                   });

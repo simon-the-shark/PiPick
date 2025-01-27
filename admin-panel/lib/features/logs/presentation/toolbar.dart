@@ -1,6 +1,5 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
-import "package:toastification/toastification.dart";
 
 import "../../../database/models.dart";
 import "../../access_zones/data/acces_zones_repository.dart";
@@ -59,11 +58,7 @@ class Toolbar extends ConsumerWidget implements PreferredSizeWidget {
                   Checkbox(
                     value: showFailed.value,
                     onChanged: (value) {
-                      toastification.show(
-                        title:
-                            const Text("Failed entries filter not implemented"),
-                        autoCloseDuration: const Duration(seconds: 3),
-                      );
+                      showFailed.value = value!;
                     },
                   ),
                   const Text("Nieudane wejścia"),
