@@ -71,7 +71,7 @@ class LogsListPage extends HookConsumerWidget {
                     return isAscending.value ? comparison : -comparison;
                   });
                 },
-                [allLogs.value, isAscending.value],
+                [allLogs.value, isAscending.value, showFailed.value],
               );
               return ListView.builder(
                 itemCount: sortedLogs.length,
