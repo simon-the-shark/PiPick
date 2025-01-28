@@ -20,6 +20,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ToastificationWrapper(
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
         title: "PiPick",
         theme: getTheme(),
         routerConfig: ref.watch(routerProvider).config(),

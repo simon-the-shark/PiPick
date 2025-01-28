@@ -78,11 +78,19 @@ class LogsListPage extends HookConsumerWidget {
                 itemBuilder: (context, index) {
                   final log = sortedLogs[index];
                   return ListTile(
+                    leading: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 32,
+                      ),
+                      child: log.successful
+                          ? const Icon(Icons.check_circle, color: Colors.green)
+                          : const Icon(Icons.cancel, color: Colors.red),
+                    ),
                     title: Text("Log ID: ${log.id} - ${log.timestamp}"),
                     subtitle: Text(
-                      'Użytkownik: ${log.user.value?.name ?? "brak"}\n'
-                      'Strefa: ${log.zone.value?.number ?? "brak"}\n'
-                      "Udane wejście: ${log.successful ? "Yes" : "No"}",
+                      'Użytkownik: ${log.user.value?.name ?? "brak"}  ${log.user.value?.surname ?? "brak"}\n'
+                      'Strefa: nr ${log.zone.value?.number ?? "brak"} (${log.zone.value?.location})\n',
                     ),
                   );
                 },
