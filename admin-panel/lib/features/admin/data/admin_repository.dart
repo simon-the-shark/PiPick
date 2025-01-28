@@ -1,5 +1,4 @@
 import "package:bcrypt/bcrypt.dart";
-import "package:fast_immutable_collections/fast_immutable_collections.dart";
 import "package:isar/isar.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
@@ -11,9 +10,23 @@ part "admin_repository.g.dart";
 @riverpod
 class AdminRepository extends _$AdminRepository {
   @override
-  Future<IList<Admin>> build() async {
+  Future<void> build() async {
+    // creates an admin with login "admin" and password "admin" if it doesn't exist
     final isar = await ref.watch(isarProvider.future);
-    return (await isar.admins.where().findAll()).toIList();
+    final adminExists =
+        await isar.admins.where().loginEqualTo("admin").findFirst();
+    if (adminExists == null) {
+      final admin = Admin()
+        ..login = "admin"
+        ..password = BCrypt.hashpw("admin", BCrypt.gensalt())
+        ..name = "admin"
+        ..surname = "admin"
+        ..email = "admin@admin.admin";
+      await isar.writeTxn(() async {
+        await isar.admins.put(admin);
+      });
+    }
+    return;
   }
 
   Future<void> putAdmin(Admin admin) async {

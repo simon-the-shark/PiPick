@@ -1,7 +1,10 @@
+import "dart:async";
+
 import "package:auto_route/auto_route.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
+import "features/admin/data/admin_repository.dart";
 import "features/login/business/auth_guard.dart";
 import "router.gr.dart";
 
@@ -47,5 +50,6 @@ class AppRouter extends RootStackRouter {
 
 @Riverpod(keepAlive: true)
 AppRouter router(Ref ref) {
+  unawaited(ref.watch(adminRepositoryProvider.future));
   return AppRouter(ref);
 }

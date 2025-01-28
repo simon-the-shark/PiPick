@@ -2,7 +2,7 @@ import "package:riverpod_annotation/riverpod_annotation.dart";
 
 import "../../../database/models.dart";
 import "../../../mqtt_client.dart";
-import "../../create_admin/data/admin_repository.dart";
+import "../../admin/data/admin_repository.dart";
 
 part "auth_service.g.dart";
 
