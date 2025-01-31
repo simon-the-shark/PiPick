@@ -115,6 +115,7 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
           ..successful = accessGranted
           ..rfidCard = rfidCard;
         logEntry.zone.value = zone;
+        logEntry.user.value = user;
 
         final payload = jsonEncode({
           "rfidCard": rfidCard,
@@ -135,6 +136,7 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
           await isar.writeTxn(() async {
             await isar.logs.put(logEntry);
             await logEntry.zone.save();
+            await logEntry.user.save();
           });
         }
 
