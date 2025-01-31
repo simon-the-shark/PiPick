@@ -57,7 +57,7 @@ Future<void> showLoadingDialog(
   StreamSubscription<AccessMessage>? stream;
   final skipper = ref.read(mqttSkipListeningProvider.notifier);
   skipper.setZoneIdtoSkip(zoneId);
-  stream = ref.watch(mqttClientProvider).value?.listen((event) async {
+  stream = ref.read(mqttClientProvider).value?.listen((event) async {
     if (event.zoneId == zoneId) {
       skipper.setZoneIdtoSkip(null);
       await stream?.cancel();
