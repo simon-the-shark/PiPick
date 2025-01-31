@@ -1,3 +1,4 @@
 {
-  "zoneId": 1
+  "zoneId": 1,
+  "broker": "localhost"
 }

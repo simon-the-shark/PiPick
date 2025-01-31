@@ -26,6 +26,18 @@ class MqttHost extends _$MqttHost {
   }
 }
 
+@Riverpod(keepAlive: true)
+class MqttSkipListening extends _$MqttSkipListening {
+  @override
+  int? build() {
+    return null;
+  }
+
+  void setZoneIdtoSkip(int? ip) {
+    state = ip;
+  }
+}
+
 typedef AccessMessage = ({
   String rfidCard,
   int zoneId,
@@ -46,8 +58,6 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
       .withClientIdentifier("flutter_client")
       // ignore: deprecated_member_use
       .keepAliveFor(20)
-      .withWillTopic("pipick/lastwill")
-      .withWillMessage("Client disconnected")
       .startClean()
       .withWillQos(MqttQos.atLeastOnce);
 
@@ -67,11 +77,13 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
     client.disconnect();
   }
 
-  const topic = "pipick/logs";
+  const topic = "pipick/+/logs";
   client.subscribe(topic, MqttQos.atMostOnce);
   final streamController = StreamController<AccessMessage>();
 
   final listenerSubscription = client.updates!.listen((updates) async {
+    final zoneId = int.parse(updates[0].topic.split("/")[1]);
+
     final recMessage = updates[0].payload as MqttPublishMessage;
     final payload =
         MqttPublishPayload.bytesToStringAsString(recMessage.payload.message);
@@ -87,7 +99,6 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
       } else {
         final String date = jsonData["date"];
         final DateTime dateTime = DateTime.parse(date);
-        final int zoneId = jsonData["zoneId"];
         final String rfidCard = jsonData["rfidCard"].toString();
 
         final isar = await ref.read(isarProvider.future);
@@ -107,22 +118,25 @@ Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
 
         final payload = jsonEncode({
           "rfidCard": rfidCard,
-          "zoneId": zoneId,
           "accessGranted": accessGranted,
           "date": dateTime.toIso8601String(),
         });
         final builder = MqttClientPayloadBuilder();
         builder.addString(payload);
-        client.publishMessage(
-          "pipick/access",
-          MqttQos.exactlyOnce,
-          builder.payload!,
-        );
+        final zoneIdtoSkip = ref.read(mqttSkipListeningProvider);
 
-        await isar.writeTxn(() async {
-          await isar.logs.put(logEntry);
-          await logEntry.zone.save();
-        });
+        if (zoneIdtoSkip != zoneId) {
+          client.publishMessage(
+            "pipick/$zoneId/access",
+            MqttQos.exactlyOnce,
+            builder.payload!,
+          );
+
+          await isar.writeTxn(() async {
+            await isar.logs.put(logEntry);
+            await logEntry.zone.save();
+          });
+        }
 
         ref.invalidate(allLogsRepositoryProvider);
         ref.invalidate(logsByZoneRepositoryProvider);
