@@ -92,11 +92,12 @@ Future<void> showLoadingDialog(
           TextButton(
             onPressed: () async {
               await stream?.cancel();
+              skipper.setZoneIdtoSkip(null);
               if (context.mounted) {
                 Navigator.of(context).pop();
               }
             },
-            child: const Text("Cancel"),
+            child: const Text("Anuluj"),
           ),
         ],
       );
