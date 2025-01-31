@@ -55,8 +55,11 @@ Future<void> showLoadingDialog(
   FormControl<String>? rfidCardControl,
 ) {
   StreamSubscription<AccessMessage>? stream;
+  final skipper = ref.read(mqttSkipListeningProvider.notifier);
+  skipper.setZoneIdtoSkip(zoneId);
   stream = ref.watch(mqttClientProvider).value?.listen((event) async {
     if (event.zoneId == zoneId) {
+      skipper.setZoneIdtoSkip(null);
       await stream?.cancel();
       rfidCardControl?.value = event.rfidCard;
       if (context.mounted) Navigator.of(context).pop();
@@ -81,7 +84,7 @@ Future<void> showLoadingDialog(
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 20),
-              Text("Waiting for card scan..."),
+              Text("Czekam na skan karty RFID..."),
             ],
           ),
         ),
