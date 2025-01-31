@@ -53,8 +53,9 @@ Future<void> showLoadingDialog(
   WidgetRef ref,
   int zoneId,
   FormControl<String>? rfidCardControl,
-) {
+) async {
   StreamSubscription<AccessMessage>? stream;
+  await ref.read(mqttClientProvider.notifier).reset();
   final skipper = ref.read(mqttSkipListeningProvider.notifier);
   skipper.setZoneIdtoSkip(zoneId);
   stream = ref.read(mqttClientProvider).value?.listen((event) async {
@@ -71,7 +72,11 @@ Future<void> showLoadingDialog(
       );
     }
   });
-
+  if (!context.mounted) {
+    await stream?.cancel();
+    skipper.setZoneIdtoSkip(null);
+    return;
+  }
   return showDialog(
     context: context,
     barrierDismissible: false,

@@ -2,7 +2,6 @@ import "dart:async";
 import "dart:convert";
 
 import "package:flutter/foundation.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:isar/isar.dart";
 import "package:mqtt_client/mqtt_client.dart";
 import "package:mqtt_client/mqtt_server_client.dart";
@@ -44,117 +43,126 @@ typedef AccessMessage = ({
 });
 
 @Riverpod(keepAlive: true)
-Future<Stream<AccessMessage>> mqttClient(Ref ref) async {
-  final host = ref.watch(mqttHostProvider);
-  if (host == null) {
-    throw Exception("MQTT host is not set");
+class MqttClient extends _$MqttClient {
+  var _streamController = StreamController<AccessMessage>();
+
+  Future<void> reset() async {
+    await _streamController.close();
+    _streamController = StreamController<AccessMessage>();
   }
-  final client = MqttServerClient(host, "flutter_client");
-  client.port = 1883;
-  client.logging(on: kDebugMode);
-  client.keepAlivePeriod = 20;
 
-  final connMessage = MqttConnectMessage()
-      .withClientIdentifier("flutter_client")
-      // ignore: deprecated_member_use
-      .keepAliveFor(20)
-      .startClean()
-      .withWillQos(MqttQos.atLeastOnce);
-
-  client.connectionMessage = connMessage;
-
-  try {
-    debugPrint("Connecting with MQTT broker...");
-    await client.connect();
-    if (client.connectionStatus!.state == MqttConnectionState.connected) {
-      debugPrint("Connected with MQTT broker");
-    } else {
-      debugPrint("Connection failed: ${client.connectionStatus}");
-      client.disconnect();
+  @override
+  Future<Stream<AccessMessage>> build() async {
+    final host = ref.watch(mqttHostProvider);
+    if (host == null) {
+      throw Exception("MQTT host is not set");
     }
-  } on Exception catch (e) {
-    debugPrint("Connection error: $e");
-    client.disconnect();
-  }
+    final client = MqttServerClient(host, "flutter_client");
+    client.port = 1883;
+    client.logging(on: kDebugMode);
+    client.keepAlivePeriod = 20;
 
-  const topic = "pipick/+/logs";
-  client.subscribe(topic, MqttQos.atMostOnce);
-  final streamController = StreamController<AccessMessage>();
+    final connMessage = MqttConnectMessage()
+        .withClientIdentifier("flutter_client")
+        // ignore: deprecated_member_use
+        .keepAliveFor(20)
+        .startClean()
+        .withWillQos(MqttQos.atLeastOnce);
 
-  final listenerSubscription = client.updates!.listen((updates) async {
-    final zoneId = int.parse(updates[0].topic.split("/")[1]);
-
-    final recMessage = updates[0].payload as MqttPublishMessage;
-    final payload =
-        MqttPublishPayload.bytesToStringAsString(recMessage.payload.message);
-
-    debugPrint("Received message: $payload from topic: ${updates[0].topic}");
+    client.connectionMessage = connMessage;
 
     try {
-      final Map<String, dynamic> jsonData = jsonDecode(payload);
-
-      if (jsonData["msg"] != null) {
-        // no way to log it in current model
-        debugPrint("message in payload: ${jsonData['msg']}");
+      debugPrint("Connecting with MQTT broker...");
+      await client.connect();
+      if (client.connectionStatus!.state == MqttConnectionState.connected) {
+        debugPrint("Connected with MQTT broker");
       } else {
-        final String date = jsonData["date"];
-        final DateTime dateTime = DateTime.parse(date);
-        final String rfidCard = jsonData["rfidCard"].toString();
-
-        final isar = await ref.read(isarProvider.future);
-        final zone = await isar.accessZones.get(zoneId);
-
-        final user =
-            await isar.users.where().rfidCardEqualTo(rfidCard).findFirst();
-
-        final accessGranted =
-            user != null && zone != null && user.allowedZones.contains(zone);
-
-        final logEntry = Logs()
-          ..timestamp = dateTime
-          ..successful = accessGranted
-          ..rfidCard = rfidCard;
-        logEntry.zone.value = zone;
-        logEntry.user.value = user;
-
-        final payload = jsonEncode({
-          "rfidCard": rfidCard,
-          "accessGranted": accessGranted,
-          "date": dateTime.toIso8601String(),
-        });
-        final builder = MqttClientPayloadBuilder();
-        builder.addString(payload);
-        final zoneIdtoSkip = ref.read(mqttSkipListeningProvider);
-
-        if (zoneIdtoSkip != zoneId) {
-          client.publishMessage(
-            "pipick/$zoneId/access",
-            MqttQos.exactlyOnce,
-            builder.payload!,
-          );
-
-          await isar.writeTxn(() async {
-            await isar.logs.put(logEntry);
-            await logEntry.zone.save();
-            await logEntry.user.save();
-          });
-        }
-
-        ref.invalidate(allLogsRepositoryProvider);
-        ref.invalidate(logsByZoneRepositoryProvider);
-
-        streamController.sink.add((rfidCard: rfidCard, zoneId: zoneId));
+        debugPrint("Connection failed: ${client.connectionStatus}");
+        client.disconnect();
       }
     } on Exception catch (e) {
-      debugPrint("Error parsing JSON: $e");
+      debugPrint("Connection error: $e");
+      client.disconnect();
     }
-  });
 
-  ref.onDispose(() {
-    listenerSubscription.cancel();
-    client.disconnect();
-    streamController.close();
-  });
+    const topic = "pipick/+/logs";
+    client.subscribe(topic, MqttQos.atMostOnce);
 
-  return streamController.stream.asBroadcastStream();
+    final listenerSubscription = client.updates!.listen((updates) async {
+      final zoneId = int.parse(updates[0].topic.split("/")[1]);
+
+      final recMessage = updates[0].payload as MqttPublishMessage;
+      final payload =
+          MqttPublishPayload.bytesToStringAsString(recMessage.payload.message);
+
+      debugPrint("Received message: $payload from topic: ${updates[0].topic}");
+
+      try {
+        final Map<String, dynamic> jsonData = jsonDecode(payload);
+
+        if (jsonData["msg"] != null) {
+          // no way to log it in current model
+          debugPrint("message in payload: ${jsonData['msg']}");
+        } else {
+          final String date = jsonData["date"];
+          final DateTime dateTime = DateTime.parse(date);
+          final String rfidCard = jsonData["rfidCard"].toString();
+
+          final isar = await ref.read(isarProvider.future);
+          final zone = await isar.accessZones.get(zoneId);
+
+          final user =
+              await isar.users.where().rfidCardEqualTo(rfidCard).findFirst();
+
+          final accessGranted =
+              user != null && zone != null && user.allowedZones.contains(zone);
+
+          final logEntry = Logs()
+            ..timestamp = dateTime
+            ..successful = accessGranted
+            ..rfidCard = rfidCard;
+          logEntry.zone.value = zone;
+          logEntry.user.value = user;
+
+          final payload = jsonEncode({
+            "rfidCard": rfidCard,
+            "accessGranted": accessGranted,
+            "date": dateTime.toIso8601String(),
+          });
+          final builder = MqttClientPayloadBuilder();
+          builder.addString(payload);
+          final zoneIdtoSkip = ref.read(mqttSkipListeningProvider);
+
+          if (zoneIdtoSkip != zoneId) {
+            client.publishMessage(
+              "pipick/$zoneId/access",
+              MqttQos.exactlyOnce,
+              builder.payload!,
+            );
+
+            await isar.writeTxn(() async {
+              await isar.logs.put(logEntry);
+              await logEntry.zone.save();
+              await logEntry.user.save();
+            });
+          }
+
+          ref.invalidate(allLogsRepositoryProvider);
+          ref.invalidate(logsByZoneRepositoryProvider);
+
+          _streamController.sink.add((rfidCard: rfidCard, zoneId: zoneId));
+        }
+      } on Exception catch (e) {
+        debugPrint("Error parsing JSON: $e");
+      }
+    });
+
+    ref.onDispose(() {
+      listenerSubscription.cancel();
+      client.disconnect();
+      _streamController.close();
+    });
+
+    return _streamController.stream.asBroadcastStream();
+  }
 }
