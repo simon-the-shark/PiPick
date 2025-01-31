@@ -33,8 +33,8 @@ class MqttSkipListening extends _$MqttSkipListening {
     return null;
   }
 
-  void setZoneIdtoSkip(int? ip) {
-    state = ip;
+  void setZoneIdtoSkip(int? id) {
+    state = id;
   }
 }
 
